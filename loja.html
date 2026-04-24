@@ -373,8 +373,8 @@
    3. Copie o URL e cole abaixo em SHEETS_CSV_URL
    4. Mude USE_SHEETS para true
    ════════════════════════════════════════════════════════════ */
-const USE_SHEETS  = false;
-const SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/pub?output=csv';
+const USE_SHEETS  = true;
+const SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1PW70ceRkj4hTqWlDKir_1COTpuHv8m51DMfPpiNHT9Y/pub?output=csv';
 
 /* ── Produtos integrados (usados quando USE_SHEETS = false) ── */
 const PRODUTOS_LOCAL = [
@@ -510,7 +510,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   updateNavAuth();
   if (USE_SHEETS) {
     document.getElementById('sheetsNotice').style.display = 'flex';
-    document.getElementById('sheetsLink').href = SHEETS_CSV_URL.replace('/pub?output=csv', '/edit');
+    document.getElementById('sheetsLink').href = 'https://docs.google.com/spreadsheets/d/1PW70ceRkj4hTqWlDKir_1COTpuHv8m51DMfPpiNHT9Y/edit';
     await loadFromSheets();
   } else {
     allProducts = [...PRODUTOS_LOCAL];
@@ -521,7 +521,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 /* ── Google Sheets CSV loader ── */
 async function loadFromSheets() {
   try {
-    const res = await fetch(SHEETS_CSV_URL);
+    const cacheBust = `&_=${Date.now()}`;
+    const res = await fetch(SHEETS_CSV_URL + cacheBust);
     const text = await res.text();
     const rows = parseCSV(text);
     if (rows.length < 2) throw new Error('Vazio');

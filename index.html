@@ -480,9 +480,8 @@
   let produtosLoaded = false;
 
   async function loadProdutos() {
-    if (produtosLoaded) return;
     try {
-      const res = await fetch(API + '?action=getProdutos');
+      const res = await fetch(API + '?action=getProdutos&_=' + Date.now());
       const data = await res.json();
       allProducts = data.map(p => {
         const nome = p['Nome do Produto'] || p['Nome'] || '';
@@ -500,7 +499,6 @@
           imagem
         };
       });
-      produtosLoaded = true;
       renderProdutos();
     } catch (e) {
       document.getElementById('productsGrid').innerHTML = '<p style="padding:40px;color:var(--muted);text-align:center">Erro ao carregar produtos. Tente novamente.</p>';
