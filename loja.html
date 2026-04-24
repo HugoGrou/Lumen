@@ -140,6 +140,12 @@
     .cart-count{position:fixed;top:16px;right:148px;background:var(--magenta);color:var(--white);width:18px;height:18px;border-radius:50%;font-size:.6rem;font-weight:600;display:none;align-items:center;justify-content:center;z-index:300;}
     .cart-count.visible{display:flex;}
 
+
+    /* ── CART DRAWER / CHECKOUT ── */
+    .cart-open{position:fixed;bottom:28px;left:28px;background:var(--magenta);color:var(--white);border:none;border-radius:999px;padding:13px 22px;font-family:var(--font-body);font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;z-index:900;box-shadow:0 12px 30px rgba(192,50,90,.25);}
+    .cart-drawer{position:fixed;top:0;right:-420px;width:min(420px,100%);height:100vh;background:var(--white);z-index:9998;box-shadow:-12px 0 40px rgba(0,0,0,.14);transition:right .3s;display:flex;flex-direction:column;}
+    .cart-drawer.open{right:0;}.cart-head{padding:22px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}.cart-head h3{font-family:var(--font-display);font-size:1.5rem;font-weight:400;color:var(--dark);}.cart-close{background:none;border:none;font-size:1.5rem;color:var(--magenta);cursor:pointer;}.cart-items{flex:1;overflow:auto;padding:18px 24px;display:flex;flex-direction:column;gap:14px;}.cart-item{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;border:1px solid var(--border);border-radius:5px;padding:10px;background:var(--bg);}.cart-item img{width:58px;height:58px;object-fit:cover;border-radius:4px;background:var(--pink-light);}.cart-item strong{font-family:var(--font-display);font-size:1rem;color:var(--dark);font-weight:500;display:block;line-height:1.2;}.cart-item span{font-size:.78rem;color:var(--magenta);}.cart-remove{border:none;background:transparent;color:var(--muted);font-size:1.1rem;cursor:pointer;}.cart-foot{border-top:1px solid var(--border);padding:18px 24px 24px;}.cart-total{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--font-display);font-size:1.35rem;color:var(--dark);}.cart-total strong{color:var(--magenta);}.checkout-btn{width:100%;padding:14px;background:var(--magenta);border:none;color:var(--white);font-family:var(--font-body);font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;border-radius:4px;}.checkout-btn:hover{background:#a02048;}.cart-note{font-size:.76rem;color:var(--muted);line-height:1.6;margin-top:12px;text-align:center;}.empty-cart{text-align:center;color:var(--muted);padding:44px 12px;font-size:.88rem;}
+
     /* ── RESPONSIVE ── */
     @media(max-width:980px){
       nav{padding:0 18px;}
@@ -361,342 +367,40 @@
 </footer>
 
 <!-- Cart toast -->
+
+<button class="cart-open" onclick="openCart()">Carrinho <span id="cartBtnCount">0</span></button>
+<div class="cart-drawer" id="cartDrawer"><div class="cart-head"><h3>O seu carrinho</h3><button class="cart-close" onclick="closeCart()">×</button></div><div class="cart-items" id="cartItems"></div><div class="cart-foot"><div class="cart-total"><span>Total</span><strong id="cartTotal">0,00€</strong></div><button class="checkout-btn" onclick="checkout()">Finalizar Compra</button><p class="cart-note">A compra fica registada automaticamente na aba <strong>Vendas</strong>.</p></div></div>
 <div class="cart-toast" id="cartToast">✓ Produto adicionado ao carrinho</div>
 
 <script>
-/* ════════════════════════════════════════════════════════════
-   CONFIGURAÇÃO GOOGLE SHEETS
-   ════════════════════════════════════════════════════════════
-   Para ligar a uma Google Sheet:
-   1. Na sua Sheet: Ficheiro → Partilhar → Publicar na Web
-   2. Escolha "Folha1" e formato "Valores separados por vírgulas (.csv)"
-   3. Copie o URL e cole abaixo em SHEETS_CSV_URL
-   4. Mude USE_SHEETS para true
-   ════════════════════════════════════════════════════════════ */
-const USE_SHEETS  = true;
-const SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1PW70ceRkj4hTqWlDKir_1COTpuHv8m51DMfPpiNHT9Y/pub?output=csv';
-
-/* ── Produtos integrados (usados quando USE_SHEETS = false) ── */
-const PRODUTOS_LOCAL = [
-  {
-    nome: 'Discos de Limpeza Reutilizáveis',
-    categoria: 'cuidados',
-    preco: 5.00,
-    imagem: 'https://skpro.pt/82936-large_default/discos-algodao-saco-80un-403501.jpg',
-    acabamento: 'natural',
-    tipoPele: 'sensivel',
-    destaque: false
-  },
-  {
-    nome: 'Espelho LED Portátil',
-    categoria: 'acessorios',
-    preco: 20.00,
-    imagem: 'https://m.media-amazon.com/images/I/51YpiEnbawL._AC_SX679_.jpg',
-    acabamento: '',
-    tipoPele: '',
-    destaque: false
-  },
-  {
-    nome: 'Pincel Kabuki Macio',
-    categoria: 'acessorios',
-    preco: 8.00,
-    imagem: 'https://centraldoscabelos.pt/wp-content/uploads/2019/02/10653.jpg',
-    acabamento: '',
-    tipoPele: '',
-    destaque: false
-  },
-  {
-    nome: 'Bálsamo Labial Nutritivo',
-    categoria: 'cuidados',
-    preco: 25.65,
-    imagem: 'https://loja.thalgoportugal.pt/images/thumbs/0000849_balsamo-nutritivo-nutri-confort-labios-15ml-sta_1024.webp',
-    acabamento: 'natural',
-    tipoPele: 'seca',
-    destaque: false
-  },
-  {
-    nome: 'Gel de Limpeza Suave',
-    categoria: 'cuidados',
-    preco: 19.07,
-    imagem: 'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/rov/rov50704/g/37.jpg',
-    acabamento: 'natural',
-    tipoPele: 'mista',
-    destaque: false
-  },
-  {
-    nome: 'Sérum Facial Hidratante',
-    categoria: 'cuidados',
-    preco: 13.15,
-    imagem: 'https://cdn2.primor.eu/media/catalog/product/cache/f3020b7489dcfc4d1d147cf4dad07b7f/8/4/8436585437030_b733.webp',
-    acabamento: 'natural',
-    tipoPele: 'seca',
-    destaque: false
-  },
-  {
-    nome: 'Paleta Sombras Neutras',
-    categoria: 'maquiagem',
-    preco: 32.00,
-    imagem: 'https://kyliecosmetics.com/cdn/shop/files/custom_resized_853aec5e-3d3d-4cd4-b843-ebabb3cf450c.jpg?crop=center&height=515&v=1689115547&width=721',
-    acabamento: 'matte',
-    tipoPele: 'oleosa',
-    destaque: false
-  },
-  {
-    nome: 'Blush Cremoso Versátil',
-    categoria: 'maquiagem',
-    preco: 5.80,
-    imagem: 'https://cdn.notinoimg.com/order_2k/catrice/4059729540485_02/velvet-pudding-blurring-blush___251217.jpg',
-    acabamento: 'brilho',
-    tipoPele: 'mista',
-    destaque: false
-  },
-  {
-    nome: 'Base Líquida Radiante',
-    categoria: 'maquiagem',
-    preco: 23.80,
-    imagem: 'https://cdn.notinoimg.com/order_2k/skin1004/8809576261622_01-o/madagascar-centella-tone-brightening-tone-up-sunscreen___221019.jpg',
-    acabamento: 'brilho',
-    tipoPele: 'seca',
-    destaque: false
-  },
-  {
-    nome: 'Lumen Blush Rosé Iluminador',
-    categoria: 'lumen',
-    preco: 7.90,
-    imagem: 'https://www.worten.pt/i/1cf2f700800b9239bd2d427dfe9fb4f133dd4537',
-    acabamento: 'brilho',
-    tipoPele: 'mista',
-    destaque: true
-  },
-  {
-    nome: 'Lumen Base Matte Longa Duração',
-    categoria: 'lumen',
-    preco: 28.40,
-    imagem: 'https://www.coisasdediva.com.br/wp-content/uploads/2024/04/base-matte-powder-1.jpg',
-    acabamento: 'matte',
-    tipoPele: 'oleosa',
-    destaque: true
-  },
-  {
-    nome: 'Lumen Lip Gloss Hidratante',
-    categoria: 'lumen',
-    preco: 38.62,
-    imagem: 'https://www.olora.com.br/wp-content/uploads/2025/05/IMG_8325_jpg.jpeg',
-    acabamento: 'brilho',
-    tipoPele: 'seca',
-    destaque: true
-  },
-  {
-    nome: 'Lumen Sérum Glow Noturno',
-    categoria: 'lumen',
-    preco: 20.40,
-    imagem: 'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/scl/scl81638/y/19.jpg',
-    acabamento: 'natural',
-    tipoPele: 'seca',
-    destaque: true
-  }
-];
-
-/* ── Estado ── */
-let allProducts = [];
-let activeCat = 'todos';
-let maxPrice = 200;
-let activeAcabamento = [];
-let activeTipoPele = [];
-let cartCount = 0;
-
-/* ── Inicialização ── */
-window.addEventListener('DOMContentLoaded', async () => {
-  updateNavAuth();
-  if (USE_SHEETS) {
-    document.getElementById('sheetsNotice').style.display = 'flex';
-    document.getElementById('sheetsLink').href = 'https://docs.google.com/spreadsheets/d/1PW70ceRkj4hTqWlDKir_1COTpuHv8m51DMfPpiNHT9Y/edit';
-    await loadFromSheets();
-  } else {
-    allProducts = [...PRODUTOS_LOCAL];
-    renderProdutos();
-  }
-});
-
-/* ── Google Sheets CSV loader ── */
-async function loadFromSheets() {
-  try {
-    const cacheBust = `&_=${Date.now()}`;
-    const res = await fetch(SHEETS_CSV_URL + cacheBust);
-    const text = await res.text();
-    const rows = parseCSV(text);
-    if (rows.length < 2) throw new Error('Vazio');
-    const headers = rows[0].map(h => h.trim().toLowerCase());
-    allProducts = rows.slice(1).filter(r => r.some(c => c.trim())).map(row => {
-      const get = (col) => (row[headers.indexOf(col)] || '').trim();
-      return {
-        nome:       get('nome') || get('name'),
-        categoria:  (get('categoria') || get('category') || '').toLowerCase(),
-        preco:      parseFloat((get('preco') || get('price') || '0').replace(',', '.')) || 0,
-        imagem:     get('imagem') || get('image') || get('img'),
-        acabamento: (get('acabamento') || '').toLowerCase(),
-        tipoPele:   (get('tipopele') || get('tipo de pele') || get('skin') || '').toLowerCase(),
-        destaque:   (get('destaque') || '').toLowerCase() === 'sim'
-      };
-    });
-    renderProdutos();
-  } catch(e) {
-    console.warn('Sheets error, usando dados locais:', e);
-    allProducts = [...PRODUTOS_LOCAL];
-    renderProdutos();
-    document.getElementById('sheetsNotice').innerHTML = '<span class="icon">⚠️</span><div><strong>Não foi possível carregar da Google Sheet.</strong> A mostrar produtos pré-definidos. Verifique o URL da Sheet e se está publicada como CSV.</div>';
-  }
-}
-
-/* ── CSV parser simples ── */
-function parseCSV(text) {
-  return text.split('\n').filter(l => l.trim()).map(line => {
-    const result = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQ = !inQ; }
-      else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
-      else { cur += ch; }
-    }
-    result.push(cur);
-    return result;
-  });
-}
-
-/* ── Render ── */
-function renderProdutos() {
-  document.getElementById('loadingSkeletons')?.remove();
-  const grid = document.getElementById('productsGrid');
-
-  let filtered = allProducts.filter(p => {
-    if (activeCat !== 'todos' && p.categoria !== activeCat) return false;
-    if (p.preco > maxPrice) return false;
-    if (activeAcabamento.length && !activeAcabamento.includes(p.acabamento)) return false;
-    if (activeTipoPele.length && !activeTipoPele.includes(p.tipoPele)) return false;
-    return true;
-  });
-
-  document.getElementById('visibleCount').textContent = filtered.length;
-
-  if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-state">
-      <p>Nenhum produto encontrado</p>
-      <span>Tente ajustar os filtros ou limpar a seleção.</span>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(p => {
-    const catLabel = p.categoria === 'lumen'
-      ? '✦ Lumen'
-      : p.categoria.charAt(0).toUpperCase() + p.categoria.slice(1);
-    const precoFmt = p.preco.toFixed(2).replace('.', ',') + '€';
-    return `
-    <div class="product-card" onclick="addToCart('${p.nome.replace(/'/g,"\\'")}')">
-      <div class="product-img">
-        ${p.destaque ? '<span class="product-badge">✦ Lumen</span>' : ''}
-        ${p.imagem
-          ? `<img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'>💄</div>'">`
-          : `<div class="product-img-placeholder">💄</div>`}
-      </div>
-      <div class="product-info">
-        <p class="product-cat">${catLabel}</p>
-        <p class="product-name">${p.nome}</p>
-        <p class="product-price">${precoFmt}</p>
-        <div class="product-action">
-          <button class="btn-cart" onclick="event.stopPropagation();addToCart('${p.nome.replace(/'/g,"\\'")}')">Adicionar</button>
-          <button class="btn-wish" title="Guardar" onclick="event.stopPropagation()">♡</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ── Filtros ── */
-function filterCat(cat, el) {
-  activeCat = cat;
-  document.querySelectorAll('.sidebar-cats a').forEach(a => a.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderProdutos();
-}
-
-function updatePrice(val) {
-  maxPrice = parseFloat(val);
-  document.getElementById('priceMax').textContent = val + '€';
-  renderProdutos();
-}
-
-function updateAcabamento() {
-  activeAcabamento = [...document.querySelectorAll('input[onchange="updateAcabamento()"]:checked')].map(cb => cb.value);
-  renderProdutos();
-}
-
-function updateTipoPele() {
-  activeTipoPele = [...document.querySelectorAll('input[onchange="updateTipoPele()"]:checked')].map(cb => cb.value);
-  renderProdutos();
-}
-
-function sortProducts(val) {
-  if (val === 'price-asc')  allProducts.sort((a,b) => a.preco - b.preco);
-  else if (val === 'price-desc') allProducts.sort((a,b) => b.preco - a.preco);
-  else if (val === 'name-az')    allProducts.sort((a,b) => a.nome.localeCompare(b.nome, 'pt'));
-  else allProducts = USE_SHEETS ? allProducts : [...PRODUTOS_LOCAL];
-  renderProdutos();
-}
-
-function toggleFilter(btn) {
-  const body = btn.nextElementSibling;
-  const arrow = btn.querySelector('.arrow');
-  const isOpen = body.classList.contains('collapsed');
-  body.classList.toggle('collapsed', !isOpen);
-  arrow.style.transform = isOpen ? 'rotate(180deg)' : '';
-}
-
-/* ── Carrinho (simulado) ── */
-function addToCart(nome) {
-  cartCount++;
-  const badge = document.getElementById('cartCount');
-  badge.textContent = cartCount;
-  badge.classList.add('visible');
-  const toast = document.getElementById('cartToast');
-  toast.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => toast.classList.remove('show'), 2400);
-}
-
-/* ── Newsletter ── */
-function subscribeNL() {
-  const email = document.getElementById('nlEmail').value.trim();
-  const msg = document.getElementById('nlMsg');
-  if (!email || !email.includes('@')) {
-    msg.textContent = 'Por favor insira um email válido.';
-    msg.className = 'nl-msg err';
-    msg.style.display = 'block';
-    return;
-  }
-  msg.textContent = '✓ Subscrito com sucesso! Obrigada.';
-  msg.className = 'nl-msg ok';
-  msg.style.display = 'block';
-  document.getElementById('nlEmail').value = '';
-}
-
-/* ── Auth ── */
-function updateNavAuth() {
-  let u = null;
-  try { u = JSON.parse(sessionStorage.getItem('lumen_user')); } catch(e){}
-  const b = document.getElementById('nav-login-btn');
-  const a = document.getElementById('nav-user-area');
-  const n = document.getElementById('nav-user-name');
-  if (b) b.style.display = u ? 'none' : '';
-  if (a) a.style.display = u ? 'flex' : 'none';
-  if (n && u) n.textContent = u.nome || u.email || '';
-}
-
-function logout() {
-  sessionStorage.removeItem('lumen_user');
-  updateNavAuth();
-}
+const SHEETDB_BASE = 'https://sheetdb.io/api/v1/uh28thaym36p8';
+const PRODUCTS_API = SHEETDB_BASE + '?sheet=Produtos';
+const USERS_API = SHEETDB_BASE + '?sheet=Utilizadores';
+const SALES_API = SHEETDB_BASE + '?sheet=Vendas';
+let allProducts=[], activeCat='todos', maxPrice=200, activeAcabamento=[], activeTipoPele=[];
+function parsePrice(v){return Number(String(v||'0').replace('€','').replace(/\s/g,'').replace(',','.'))||0;}
+function formatPrice(v){return (Number(v)||0).toFixed(2).replace('.',',')+'€';}
+function getCart(){try{return JSON.parse(localStorage.getItem('lumen_cart'))||[]}catch{return[]}}
+function saveCart(c){localStorage.setItem('lumen_cart',JSON.stringify(c));updateCartUI();}
+function getUser(){try{return JSON.parse(sessionStorage.getItem('lumen_user'))}catch{return null}}
+window.addEventListener('DOMContentLoaded',async()=>{updateNavAuth();updateCartUI();document.getElementById('sheetsNotice').style.display='flex';document.getElementById('sheetsLink').href='https://docs.google.com/spreadsheets/d/1PW70ceRkj4hTqWlDKir_1COTpuHv8m51DMfPpiNHT9Y/edit';await loadProducts();});
+async function loadProducts(){try{let r=await fetch(PRODUCTS_API+'&_='+Date.now());let data=await r.json();if(!Array.isArray(data)||!data.length){r=await fetch(SHEETDB_BASE+'?_='+Date.now());data=await r.json();}allProducts=data.map(row=>{const nome=row['Nome do Produto']||row.Nome||row.nome||'';const precoRaw=row['Preço']||row.Preco||row.preco||'0';return{nome,categoria:String(row.Categoria||row['Categoria']||'').toLowerCase(),preco:parsePrice(precoRaw),imagem:row.Imagem||row['Imagem']||'',acabamento:String(row.Acabamento||row['Acabamento']||'').toLowerCase(),tipoPele:String(row['Tipo de Pele']||row.TipoPele||'').toLowerCase()}}).filter(p=>p.nome);renderProdutos();}catch(e){console.error(e);document.getElementById('productsGrid').innerHTML='<div class="empty-state"><p>Não foi possível carregar produtos.</p><span>Confirme a API SheetDB.</span></div>';}}
+function renderProdutos(){document.getElementById('loadingSkeletons')?.remove();const grid=document.getElementById('productsGrid');let filtered=allProducts.filter(p=>{if(activeCat!=='todos'&&p.categoria!==activeCat)return false;if(p.preco>maxPrice)return false;if(activeAcabamento.length&&!activeAcabamento.includes(p.acabamento))return false;if(activeTipoPele.length&&!activeTipoPele.includes(p.tipoPele))return false;return true;});document.getElementById('visibleCount').textContent=filtered.length;if(!filtered.length){grid.innerHTML='<div class="empty-state"><p>Nenhum produto encontrado</p><span>Tente ajustar os filtros.</span></div>';return;}grid.innerHTML=filtered.map((p,idx)=>`<div class="product-card"><div class="product-img">${p.categoria==='lumen'?'<span class="product-badge">✦ Lumen</span>':''}${p.imagem?`<img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'product-img-placeholder\'>💄</div>'">`:'<div class="product-img-placeholder">💄</div>'}</div><div class="product-info"><p class="product-cat">${p.categoria?p.categoria.charAt(0).toUpperCase()+p.categoria.slice(1):'Produto'}</p><p class="product-name">${p.nome}</p><p class="product-price">${formatPrice(p.preco)}</p><div class="product-action"><button class="btn-cart" onclick="addToCart(${idx})">Adicionar</button><button class="btn-wish" title="Guardar">♡</button></div></div></div>`).join('');}
+function filterCat(cat,el){activeCat=cat;document.querySelectorAll('.sidebar-cats a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');renderProdutos();}
+function updatePrice(val){maxPrice=parseFloat(val);document.getElementById('priceMax').textContent=val+'€';renderProdutos();}
+function updateAcabamento(){activeAcabamento=[...document.querySelectorAll('input[onchange="updateAcabamento()"]:checked')].map(cb=>cb.value);renderProdutos();}
+function updateTipoPele(){activeTipoPele=[...document.querySelectorAll('input[onchange="updateTipoPele()"]:checked')].map(cb=>cb.value);renderProdutos();}
+function sortProducts(val){if(val==='price-asc')allProducts.sort((a,b)=>a.preco-b.preco);else if(val==='price-desc')allProducts.sort((a,b)=>b.preco-a.preco);else if(val==='name-az')allProducts.sort((a,b)=>a.nome.localeCompare(b.nome,'pt'));renderProdutos();}
+function toggleFilter(btn){const body=btn.nextElementSibling,arrow=btn.querySelector('.arrow'),isOpen=body.classList.contains('collapsed');body.classList.toggle('collapsed',!isOpen);arrow.style.transform=isOpen?'rotate(180deg)':'';}
+function addToCart(index){const p=allProducts[index],cart=getCart(),id=p.nome,item=cart.find(i=>i.id===id);if(item)item.qtd+=1;else cart.push({id,nome:p.nome,preco:p.preco,imagem:p.imagem,qtd:1});saveCart(cart);const t=document.getElementById('cartToast');t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function removeFromCart(id){saveCart(getCart().filter(i=>i.id!==id));}
+function openCart(){document.getElementById('cartDrawer').classList.add('open');}
+function closeCart(){document.getElementById('cartDrawer').classList.remove('open');}
+function updateCartUI(){const cart=getCart(),count=cart.reduce((s,i)=>s+i.qtd,0),total=cart.reduce((s,i)=>s+i.preco*i.qtd,0);const badge=document.getElementById('cartCount');if(badge){badge.textContent=count;badge.classList.toggle('visible',count>0);}const bc=document.getElementById('cartBtnCount');if(bc)bc.textContent=count;const te=document.getElementById('cartTotal');if(te)te.textContent=formatPrice(total);const items=document.getElementById('cartItems');if(!items)return;if(!cart.length){items.innerHTML='<div class="empty-cart">O carrinho está vazio.</div>';return;}items.innerHTML=cart.map(i=>`<div class="cart-item">${i.imagem?`<img src="${i.imagem}" alt="${i.nome}">`:'<img alt="Produto">'}<div><strong>${i.nome}</strong><span>${i.qtd} × ${formatPrice(i.preco)}</span></div><button class="cart-remove" onclick="removeFromCart('${i.id.replace(/'/g,"\'")}')">×</button></div>`).join('');}
+async function checkout(){const cart=getCart(),user=getUser();if(!cart.length)return alert('O carrinho está vazio.');if(!user){alert('Precisa iniciar sessão antes de finalizar a compra.');location.href='login.html';return;}const total=cart.reduce((s,i)=>s+i.preco*i.qtd,0);const venda={'Valor (€)':formatPrice(total),'Email do Cliente':user.email||user.Email,'Data':new Date().toLocaleDateString('pt-PT'),'Hora':new Date().toLocaleTimeString('pt-PT'),'Produtos':cart.map(i=>`${i.qtd}x ${i.nome}`).join(' | ')};try{const res=await fetch(SALES_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:venda})});if(!res.ok)throw new Error('Erro');localStorage.removeItem('lumen_cart');updateCartUI();closeCart();alert('Compra registada com sucesso no Google Sheets!');}catch(e){console.error(e);alert('Não foi possível registar a venda. Confirme a aba Vendas.');}}
+function subscribeNL(){const email=document.getElementById('nlEmail').value.trim(),msg=document.getElementById('nlMsg');if(!email||!email.includes('@')){msg.textContent='Por favor insira um email válido.';msg.className='nl-msg err';msg.style.display='block';return;}msg.textContent='✓ Subscrito com sucesso! Obrigada.';msg.className='nl-msg ok';msg.style.display='block';document.getElementById('nlEmail').value='';}
+function updateNavAuth(){const u=getUser(),b=document.getElementById('nav-login-btn'),a=document.getElementById('nav-user-area'),n=document.getElementById('nav-user-name');if(b)b.style.display=u?'none':'';if(a)a.style.display=u?'flex':'none';if(n&&u)n.textContent='Olá, '+(u.nome||u.email||'')+' ✦';}
+function logout(){sessionStorage.removeItem('lumen_user');updateNavAuth();}
 </script>
 </body>
 </html>
