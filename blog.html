@@ -126,12 +126,13 @@ footer{background:#241010;color:white;padding:60px 7vw 28px}.footer-grid{display
     <div><h4>Marca</h4><a href="servicos.html">Serviços</a><a href="sobre.html">Sobre Nós</a><a href="login.html">Área Cliente</a></div>
     <div><h4>Contactos</h4><p>lumen@exemplo.pt<br>Coimbra, Portugal</p></div>
   </div>
-  <div class="footer-bottom"><span>© 2026 Lumen. Projeto académico.</span><span>Política de Privacidade · Termos</span></div>
+  <div class="footer-bottom"><span>© 2026 Lumen. Projeto académico.</span><span><a href="privacidade.html">Política de Privacidade</a> · <a href="termos.html">Termos</a></span></div>
 </footer>
 <script>
 const buttons=document.querySelectorAll('.filter');
 const posts=document.querySelectorAll('.post');
 buttons.forEach(btn=>btn.addEventListener('click',()=>{buttons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');const f=btn.dataset.filter;posts.forEach(p=>{p.style.display=(f==='all'||p.dataset.cat===f)?'block':'none';});}));
 </script>
+<div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
 </body>
 </html>
