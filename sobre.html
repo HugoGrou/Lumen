@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumen – Sobre Nós</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--pink:#f2c4ce;--pink2:#f9e2e8;--cream:#fff8f5;--magenta:#c0325a;--dark:#261313;--text:#4c2a2a;--muted:#8b6666;--white:#fff;--border:#ead1d7;--display:'Cormorant Garamond',serif;--body:'Jost',sans-serif}
+    html{scroll-behavior:smooth} body{font-family:var(--body);background:var(--cream);color:var(--text);font-weight:300;overflow-x:hidden}
+    nav{position:fixed;top:0;left:0;right:0;height:64px;background:var(--pink);z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 46px;box-shadow:0 12px 30px rgba(192,50,90,.10)}
+    .nav-logo{font-family:var(--display);font-size:1.75rem;font-weight:600;letter-spacing:.08em;color:var(--magenta);text-decoration:none}
+    .nav-links{display:flex;gap:28px;list-style:none;align-items:center}.nav-links a{color:#8a0032;text-decoration:none;font-size:1rem;font-weight:400}.nav-links a:hover,.nav-links a.active{color:var(--magenta)}
+    .nav-btn{border:1.5px solid var(--magenta);color:var(--magenta);padding:8px 20px;border-radius:6px;text-decoration:none;font-size:.78rem;background:rgba(255,255,255,.18)}.nav-btn:hover{background:var(--magenta);color:#fff}
+    .hero{min-height:92vh;padding-top:64px;display:grid;grid-template-columns:1.05fr .95fr;background:linear-gradient(135deg,var(--pink),#f6d3db)}
+    .hero-copy{padding:92px 72px;display:flex;flex-direction:column;justify-content:center}.eyebrow{font-size:.68rem;letter-spacing:.34em;text-transform:uppercase;color:var(--magenta);font-weight:600;margin-bottom:18px}
+    h1{font-family:var(--display);font-size:clamp(3rem,6vw,5.8rem);line-height:.98;font-weight:300;color:var(--dark);margin-bottom:28px} h1 em{color:var(--magenta);font-style:italic}
+    .lead{font-size:1rem;line-height:1.9;color:#704a4a;max-width:590px;margin-bottom:28px}.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}.btn{display:inline-block;padding:14px 30px;border-radius:999px;text-decoration:none;font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;font-weight:500}.btn-primary{background:var(--magenta);color:#fff}.btn-secondary{border:1px solid rgba(192,50,90,.35);color:var(--magenta);background:rgba(255,255,255,.35)}
+    .hero-visual{position:relative;overflow:hidden}.hero-visual img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95)}.floating-card{position:absolute;left:38px;bottom:38px;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.55);border-radius:22px;padding:24px;max-width:310px;box-shadow:0 24px 50px rgba(80,30,45,.14)}.floating-card strong{font-family:var(--display);font-size:1.5rem;color:var(--dark)}.floating-card p{font-size:.82rem;line-height:1.7;color:var(--muted);margin-top:8px}
+    section{padding:92px 72px}.section-head{text-align:center;max-width:720px;margin:0 auto 54px}.section-title{font-family:var(--display);font-size:clamp(2.1rem,4vw,3.6rem);font-weight:300;color:var(--dark);line-height:1.1;margin-bottom:16px}.section-desc{font-size:.94rem;line-height:1.85;color:var(--muted)}
+    .story{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:center;background:#fff}.story-img{border-radius:28px;overflow:hidden;min-height:520px}.story-img img{width:100%;height:100%;object-fit:cover;display:block}.story-text p{font-size:.95rem;line-height:1.95;color:var(--muted);margin-bottom:18px}.quote{margin-top:28px;padding:28px 30px;border-left:3px solid var(--magenta);background:var(--pink2);border-radius:0 18px 18px 0}.quote blockquote{font-family:var(--display);font-style:italic;font-size:1.55rem;line-height:1.35;color:var(--dark)}
+    .values{background:var(--pink2)}.values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.value-card{background:#fff;border:1px solid var(--border);border-radius:24px;padding:34px 26px;min-height:245px;box-shadow:0 18px 45px rgba(192,50,90,.07);transition:.25s}.value-card:hover{transform:translateY(-6px);box-shadow:0 24px 55px rgba(192,50,90,.12)}.value-icon{font-size:2.1rem;margin-bottom:18px}.value-card h3{font-family:var(--display);font-size:1.45rem;color:var(--dark);font-weight:400;margin-bottom:12px}.value-card p{font-size:.86rem;line-height:1.8;color:var(--muted)}
+    .timeline{background:#fff}.timeline-wrap{max-width:980px;margin:0 auto;display:grid;gap:18px}.timeline-item{display:grid;grid-template-columns:140px 1fr;gap:26px;align-items:start;padding:26px;border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,#fff,#fff7f9)}.year{font-family:var(--display);font-size:2.2rem;color:var(--magenta)}.timeline-item h3{font-family:var(--display);font-size:1.35rem;color:var(--dark);font-weight:400;margin-bottom:8px}.timeline-item p{font-size:.88rem;line-height:1.8;color:var(--muted)}
+    .stats{background:#241010;color:#fff;display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0}.stat{padding:58px 30px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}.stat:last-child{border-right:0}.stat-num{font-family:var(--display);font-size:3.4rem;color:var(--pink);line-height:1}.stat-label{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.46);margin-top:10px}
+    .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}.team-card{text-align:center;background:#fff;border:1px solid var(--border);border-radius:24px;padding:30px 20px}.team-photo{width:135px;height:135px;border-radius:50%;overflow:hidden;margin:0 auto 20px;border:4px solid var(--pink2)}.team-photo img{width:100%;height:100%;object-fit:cover}.team-card h3{font-family:var(--display);font-size:1.28rem;color:var(--dark);font-weight:400}.role{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--magenta);font-weight:600;margin:8px 0 12px}.team-card p{font-size:.8rem;line-height:1.7;color:var(--muted)}
+    .cta{background:linear-gradient(135deg,var(--pink),#f8dbe2);text-align:center}.cta .section-head{margin-bottom:0}.cta-actions{margin-top:28px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+    footer{background:#241010;padding:56px 72px 28px;color:#fff}.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:38px;margin-bottom:36px}.footer-logo{font-family:var(--display);font-size:1.9rem;letter-spacing:.08em;margin-bottom:12px}.footer-tagline,.footer-col p{font-size:.82rem;line-height:1.8;color:rgba(255,255,255,.48)}.footer-col h4{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);margin-bottom:16px}.footer-col a{display:block;color:rgba(255,255,255,.5);font-size:.82rem;text-decoration:none;margin-bottom:9px}.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:rgba(255,255,255,.32);font-size:.72rem}
+    .reveal{opacity:0;transform:translateY(22px);transition:.7s}.reveal.visible{opacity:1;transform:translateY(0)}
+    @media(max-width:900px){nav{padding:0 18px}.nav-links{gap:16px}.nav-links a{font-size:.9rem}.nav-btn{display:none}.hero,.story{grid-template-columns:1fr}.hero-copy,section{padding:72px 24px}.hero-visual{height:430px}.story-img{min-height:330px}.values-grid,.team-grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.timeline-item{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}footer{padding:48px 24px 28px}}
+    @media(max-width:540px){.nav-logo{display:none}.nav-links{width:100%;justify-content:center;gap:14px}.nav-links a{font-size:.86rem}.values-grid,.team-grid,.stats{grid-template-columns:1fr}.hero-copy{padding:64px 24px}.floating-card{left:18px;right:18px;bottom:18px}}
+  </style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9W57080ZKR');
+  </script>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">Lumen</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="loja.html">Loja</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="servicos.html">Serviços</a></li>
+    <li><a href="sobre.html" class="active">Sobre Nós</a></li>
+  </ul>
+  <a class="nav-btn" href="login.html">Iniciar Sessão</a>
+</nav>
+
+<header class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Sobre a Lumen</p>
+    <h1>Beleza com <em>propósito</em>, dados e inspiração.</h1>
+    <p class="lead">A Lumen é uma loja online de beleza criada no contexto académico, pensada para unir cosmética, experiência digital e análise de dados numa marca elegante, acessível e moderna.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="loja.html">Conhecer a Loja</a>
+      <a class="btn btn-secondary" href="servicos.html">Ver Serviços</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&q=85" alt="Produtos de beleza Lumen">
+    <div class="floating-card"><strong>Lumen ✦</strong><p>Um projeto de Web Marketing e Ciência de Dados aplicado ao universo da beleza online.</p></div>
+  </div>
+</header>
+
+<section class="story">
+  <div class="story-img reveal"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=900&q=85" alt="Maquilhagem e skincare"></div>
+  <div class="story-text reveal">
+    <p class="eyebrow">A Nossa História</p>
+    <h2 class="section-title">Criámos uma marca para tornar a beleza mais simples, próxima e inteligente.</h2>
+    <p>A Lumen nasceu com a ideia de construir uma experiência de compra de cosméticos clara, visual e personalizada. O objetivo é ajudar cada cliente a descobrir produtos adequados ao seu estilo, tipo de pele e rotina.</p>
+    <p>O projeto combina uma loja dinâmica ligada ao Google Sheets, páginas editoriais, serviços de consultoria e uma identidade visual feminina, premium e contemporânea.</p>
+    <p>Mais do que vender produtos, a Lumen procura educar, inspirar e criar confiança em cada escolha de beleza.</p>
+    <div class="quote"><blockquote>“A beleza não deve complicar. Deve iluminar quem já somos.”</blockquote></div>
+  </div>
+</section>
+
+<section class="values">
+  <div class="section-head">
+    <p class="eyebrow">Valores</p>
+    <h2 class="section-title">Aquilo que define a nossa marca</h2>
+    <p class="section-desc">Cada detalhe da Lumen foi pensado para criar uma experiência coerente, elegante e centrada no cliente.</p>
+  </div>
+  <div class="values-grid">
+    <div class="value-card reveal"><div class="value-icon">🌸</div><h3>Autenticidade</h3><p>Defendemos uma beleza real, inclusiva e adaptada a diferentes pessoas, rotinas e estilos.</p></div>
+    <div class="value-card reveal"><div class="value-icon">✨</div><h3>Elegância</h3><p>Design limpo, navegação simples e uma estética premium inspirada no universo editorial de beleza.</p></div>
+    <div class="value-card reveal"><div class="value-icon">📊</div><h3>Dados</h3><p>Usamos informação de produtos, clientes e vendas para melhorar decisões e personalizar a experiência.</p></div>
+    <div class="value-card reveal"><div class="value-icon">🤍</div><h3>Confiança</h3><p>Conteúdos claros, produtos bem organizados e uma experiência transparente do início ao fim.</p></div>
+  </div>
+</section>
+
+<section class="timeline">
+  <div class="section-head">
+    <p class="eyebrow">Evolução</p>
+    <h2 class="section-title">Como a Lumen foi construída</h2>
+  </div>
+  <div class="timeline-wrap">
+    <div class="timeline-item reveal"><div class="year">01</div><div><h3>Identidade da marca</h3><p>Definição do nome, estilo visual, paleta rosa, tipografia elegante e posicionamento premium acessível.</p></div></div>
+    <div class="timeline-item reveal"><div class="year">02</div><div><h3>Loja online dinâmica</h3><p>Criação da loja com produtos ligados ao Google Sheets, permitindo atualizar o catálogo sem mexer no código.</p></div></div>
+    <div class="timeline-item reveal"><div class="year">03</div><div><h3>Clientes e vendas</h3><p>Integração de login, carrinho e registo de vendas para transformar o site num mini e-commerce funcional.</p></div></div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num">13</div><div class="stat-label">Produtos Iniciais</div></div>
+  <div class="stat reveal"><div class="stat-num">3</div><div class="stat-label">Áreas de Dados</div></div>
+  <div class="stat reveal"><div class="stat-num">5</div><div class="stat-label">Páginas Principais</div></div>
+  <div class="stat reveal"><div class="stat-num">100%</div><div class="stat-label">Projeto Digital</div></div>
+</div>
+
+<section>
+  <div class="section-head">
+    <p class="eyebrow">Equipa</p>
+    <h2 class="section-title">Quem está por trás da Lumen</h2>
+    <p class="section-desc">Uma equipa fictícia criada para representar as áreas essenciais de um projeto de e-commerce: marca, conteúdo, experiência e dados.</p>
+  </div>
+  <div class="team-grid">
+    <div class="team-card reveal"><div class="team-photo"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80" alt="Direção de marca"></div><h3>Ana Silva</h3><div class="role">Direção de Marca</div><p>Define a identidade, posicionamento e tom visual da Lumen.</p></div>
+    <div class="team-card reveal"><div class="team-photo"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80" alt="Conteúdo"></div><h3>Mariana Costa</h3><div class="role">Conteúdo</div><p>Cria artigos, campanhas e mensagens para aproximar a marca das clientes.</p></div>
+    <div class="team-card reveal"><div class="team-photo"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80" alt="UX e loja"></div><h3>Sofia Martins</h3><div class="role">UX & Loja</div><p>Organiza páginas, produtos e experiência de navegação.</p></div>
+    <div class="team-card reveal"><div class="team-photo"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80" alt="Dados"></div><h3>Beatriz Ferreira</h3><div class="role">Dados</div><p>Acompanha produtos, clientes e vendas para apoiar decisões.</p></div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="section-head">
+    <p class="eyebrow">Próximo passo</p>
+    <h2 class="section-title">Descobre a experiência Lumen</h2>
+    <p class="section-desc">Explora produtos, lê conteúdos no blog ou marca um serviço personalizado para encontrares a tua rotina ideal.</p>
+    <div class="cta-actions"><a class="btn btn-primary" href="loja.html">Ir para a Loja</a><a class="btn btn-secondary" href="blog.html">Ler o Blog</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div><div class="footer-logo">Lumen</div><p class="footer-tagline">Beleza online com uma experiência elegante, simples e orientada por dados.</p></div>
+    <div class="footer-col"><h4>Navegação</h4><a href="index.html">Início</a><a href="loja.html">Loja</a><a href="blog.html">Blog</a><a href="servicos.html">Serviços</a></div>
+    <div class="footer-col"><h4>Marca</h4><a href="sobre.html">Sobre Nós</a><a href="login.html">Área Cliente</a><a href="loja.html">Produtos</a></div>
+    <div class="footer-col"><h4>Contacto</h4><p>Projeto académico<br>ISCAC · Coimbra<br>lumen@exemplo.pt</p></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Lumen. Projeto académico.</span><span>Web Marketing · Ciência de Dados para a Gestão</span></div>
+</footer>
+<script>
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('visible'); }), {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+<div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+</body>
+</html>

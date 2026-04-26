@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumen – Blog</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--pink:#f4c6d0;--pink2:#fff4f7;--magenta:#c0325a;--dark:#241515;--text:#4d2d2d;--muted:#8d7070;--white:#fff;--border:#ead0d7;--display:'Cormorant Garamond',serif;--body:'Jost',sans-serif}
+html{scroll-behavior:smooth} body{font-family:var(--body);background:linear-gradient(180deg,#fff8fa,#fff2f6);color:var(--text);overflow-x:hidden} a{text-decoration:none;color:inherit}
+nav{position:fixed;top:0;left:0;right:0;height:72px;background:rgba(244,198,208,.94);backdrop-filter:blur(14px);z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 48px;box-shadow:0 8px 28px rgba(192,50,90,.08)}
+.logo{font-family:var(--display);font-size:2rem;letter-spacing:.08em;color:var(--magenta);font-weight:600}.nav-links{display:flex;gap:28px;align-items:center;list-style:none}.nav-links a{font-size:.88rem;color:#8f0035;transition:.25s}.nav-links a:hover,.nav-links a.active{color:var(--magenta)}.login-btn{border:1px solid var(--magenta);color:var(--magenta);padding:10px 22px;border-radius:8px;font-size:.78rem;transition:.25s}.login-btn:hover{background:var(--magenta);color:white}
+.hero{padding:142px 7vw 76px;background:radial-gradient(circle at 85% 25%,rgba(255,255,255,.7),transparent 30%),linear-gradient(135deg,var(--pink),#f8dce3);display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;min-height:620px}.eyebrow{font-size:.68rem;letter-spacing:.35em;text-transform:uppercase;color:var(--magenta);font-weight:600;margin-bottom:18px}.hero h1{font-family:var(--display);font-size:clamp(3.2rem,7vw,6rem);line-height:.98;font-weight:300;color:var(--dark);margin-bottom:24px}.hero h1 em{color:var(--magenta);font-style:italic}.hero p{max-width:560px;line-height:1.9;color:var(--muted);font-size:.98rem}.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 30px;border-radius:999px;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;transition:.25s}.btn-primary{background:var(--magenta);color:white;box-shadow:0 15px 30px rgba(192,50,90,.22)}.btn-primary:hover{transform:translateY(-3px);background:#a02048}.btn-outline{border:1px solid rgba(192,50,90,.45);color:var(--magenta)}.btn-outline:hover{background:white}.hero-card{position:relative;border-radius:34px;overflow:hidden;box-shadow:0 30px 80px rgba(96,38,52,.18);background:white}.hero-card img{width:100%;height:520px;object-fit:cover;display:block}.floating-note{position:absolute;left:26px;bottom:26px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);padding:18px 22px;border-radius:20px;max-width:270px}.floating-note strong{font-family:var(--display);font-size:1.35rem;color:var(--dark)}.floating-note span{display:block;color:var(--muted);font-size:.78rem;line-height:1.6;margin-top:4px}
+.section{padding:82px 7vw}.section-head{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:34px}.label{font-size:.66rem;letter-spacing:.32em;text-transform:uppercase;color:var(--magenta);font-weight:600;margin-bottom:10px}.title{font-family:var(--display);font-size:clamp(2.4rem,4vw,3.8rem);line-height:1;font-weight:300;color:var(--dark)}.desc{color:var(--muted);line-height:1.85;max-width:550px;font-size:.92rem}
+.featured{display:grid;grid-template-columns:1.1fr .9fr;background:white;border:1px solid var(--border);border-radius:32px;overflow:hidden;box-shadow:0 22px 70px rgba(192,50,90,.09)}.featured-img{min-height:430px;overflow:hidden}.featured-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.6s}.featured:hover .featured-img img{transform:scale(1.04)}.featured-body{padding:56px;display:flex;flex-direction:column;justify-content:center}.tag{display:inline-flex;width:max-content;background:#fff0f4;color:var(--magenta);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;padding:7px 12px;border-radius:999px;margin-bottom:20px}.featured h2{font-family:var(--display);font-size:clamp(2rem,3.2vw,3.1rem);font-weight:300;line-height:1.08;color:var(--dark);margin-bottom:18px}.featured p{line-height:1.85;color:var(--muted);margin-bottom:28px}.read-link{color:var(--magenta);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;border-bottom:1px solid rgba(192,50,90,.3);width:max-content;padding-bottom:4px}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:34px}.filter{border:1px solid var(--border);background:white;color:var(--muted);padding:10px 18px;border-radius:999px;font-family:var(--body);cursor:pointer;transition:.2s}.filter:hover,.filter.active{border-color:var(--magenta);background:var(--magenta);color:white}.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.post{background:white;border:1px solid var(--border);border-radius:26px;overflow:hidden;transition:.3s;box-shadow:0 12px 32px rgba(192,50,90,.045)}.post:hover{transform:translateY(-6px);box-shadow:0 22px 55px rgba(192,50,90,.12)}.post-img{height:250px;overflow:hidden;background:var(--pink2)}.post-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.55s}.post:hover .post-img img{transform:scale(1.06)}.post-body{padding:24px}.meta{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:14px}.cat{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--magenta);font-weight:600}.date{font-size:.74rem;color:var(--muted)}.post h3{font-family:var(--display);font-size:1.55rem;line-height:1.15;font-weight:400;color:var(--dark);margin-bottom:12px}.post p{font-size:.86rem;line-height:1.75;color:var(--muted);margin-bottom:18px}
+.trends{background:#2a1010;color:white}.trends .title{color:white}.trends .desc{color:rgba(255,255,255,.55)}.trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px}.trend{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:26px;border-radius:24px}.trend span{font-family:var(--display);font-size:2.6rem;color:var(--pink);display:block;margin-bottom:14px}.trend h3{font-family:var(--display);font-size:1.35rem;font-weight:400;margin-bottom:8px}.trend p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.5)}
+.newsletter{margin:82px 7vw;background:linear-gradient(135deg,#f6cbd4,#fff0f4);border-radius:34px;padding:72px 36px;text-align:center}.newsletter p{max-width:620px;margin:0 auto;color:var(--muted);line-height:1.85}.nl-form{display:flex;max-width:530px;margin:30px auto 0;background:white;border-radius:999px;overflow:hidden;border:1px solid rgba(192,50,90,.18);box-shadow:0 18px 40px rgba(192,50,90,.08)}.nl-form input{flex:1;border:0;outline:0;padding:16px 22px;font-family:var(--body);font-size:.9rem}.nl-form button{border:0;background:var(--magenta);color:white;padding:0 28px;font-family:var(--body);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;cursor:pointer}
+footer{background:#241010;color:white;padding:60px 7vw 28px}.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}.footer-logo{font-family:var(--display);font-size:2rem;letter-spacing:.08em;color:white;margin-bottom:14px}.footer-grid p,.footer-grid a{color:rgba(255,255,255,.48);font-size:.84rem;line-height:1.8}.footer-grid h4{font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--pink);margin-bottom:16px}.footer-grid a{display:block;margin-bottom:8px}.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:22px;color:rgba(255,255,255,.35);font-size:.72rem;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+@media(max-width:950px){nav{padding:0 22px}.nav-links{gap:16px}.hero{grid-template-columns:1fr;padding-top:120px}.hero-card img{height:360px}.featured{grid-template-columns:1fr}.blog-grid,.trend-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){nav{height:auto;min-height:72px;align-items:flex-start;padding:18px 18px;flex-direction:column;gap:16px}.nav-links{flex-wrap:wrap;gap:14px}.login-btn{display:none}.hero{padding:158px 24px 56px}.section{padding:58px 24px}.section-head{display:block}.blog-grid,.trend-grid,.footer-grid{grid-template-columns:1fr}.featured-body{padding:32px}.newsletter{margin:58px 24px;padding:52px 22px}.nl-form{flex-direction:column;border-radius:18px}.nl-form button{padding:15px}}
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9W57080ZKR');
+  </script>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Lumen</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="loja.html">Loja</a></li>
+    <li><a class="active" href="blog.html">Blog</a></li>
+    <li><a href="servicos.html">Serviços</a></li>
+    <li><a href="sobre.html">Sobre Nós</a></li>
+  </ul>
+  <a href="login.html" class="login-btn">Iniciar Sessão</a>
+</nav>
+
+<header class="hero">
+  <div>
+    <div class="eyebrow">Lumen Journal</div>
+    <h1>Beleza com <em>ritual</em>, ciência e leveza.</h1>
+    <p>Inspiração, guias práticos e tendências para cuidares da pele, escolheres maquilhagem com confiança e criares uma rotina que combina contigo.</p>
+    <div class="hero-actions">
+      <a href="#artigos" class="btn btn-primary">Ler Artigos</a>
+      <a href="loja.html" class="btn btn-outline">Ver Produtos</a>
+    </div>
+  </div>
+  <div class="hero-card">
+    <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1100&q=80" alt="Produtos de maquilhagem e skincare">
+    <div class="floating-note"><strong>Rotinas reais</strong><span>Dicas simples para pele luminosa e maquilhagem natural.</span></div>
+  </div>
+</header>
+
+<section class="section">
+  <div class="section-head">
+    <div><div class="label">Em destaque</div><h2 class="title">O guia Lumen para uma pele luminosa</h2></div>
+    <p class="desc">Uma seleção editorial para escolher séruns, bases, blushes e acessórios com mais consciência e estilo.</p>
+  </div>
+  <article class="featured">
+    <div class="featured-img"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=80" alt="Maquilhagem premium"></div>
+    <div class="featured-body">
+      <span class="tag">Skincare & Glow</span>
+      <h2>Como criar uma rotina de beleza elegante em apenas 10 minutos</h2>
+      <p>Da limpeza suave ao toque final de blush: aprende a construir uma rotina prática, bonita e funcional para o dia a dia.</p>
+      <a class="read-link" href="#artigos">Continuar a ler</a>
+    </div>
+  </article>
+</section>
+
+<section class="section" id="artigos">
+  <div class="section-head">
+    <div><div class="label">Artigos recentes</div><h2 class="title">Inspiração para cada rotina</h2></div>
+    <p class="desc">Filtra por tema e descobre conteúdos rápidos para comprares melhor e cuidares da tua pele.</p>
+  </div>
+  <div class="filters">
+    <button class="filter active" data-filter="all">Todos</button>
+    <button class="filter" data-filter="skincare">Skincare</button>
+    <button class="filter" data-filter="maquilhagem">Maquilhagem</button>
+    <button class="filter" data-filter="guias">Guias</button>
+  </div>
+  <div class="blog-grid">
+    <article class="post" data-cat="skincare"><div class="post-img"><img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=900&q=80" alt="Cuidados de pele"></div><div class="post-body"><div class="meta"><span class="cat">Skincare</span><span class="date">5 min</span></div><h3>Como escolher um sérum para pele seca, mista ou oleosa</h3><p>Texturas, ingredientes e acabamento: o essencial para comprares sem confusão.</p><a class="read-link" href="loja.html">Ver produtos</a></div></article>
+    <article class="post" data-cat="maquilhagem"><div class="post-img"><img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=900&q=80" alt="Pincéis de maquilhagem"></div><div class="post-body"><div class="meta"><span class="cat">Maquilhagem</span><span class="date">4 min</span></div><h3>Base matte ou radiante: qual combina com o teu dia?</h3><p>Um guia simples para escolher acabamento de acordo com pele, ocasião e conforto.</p><a class="read-link" href="loja.html">Comprar bases</a></div></article>
+    <article class="post" data-cat="guias"><div class="post-img"><img src="https://images.unsplash.com/photo-1631214540242-3cd8c9e669fb?auto=format&fit=crop&w=900&q=80" alt="Produtos de beleza organizados"></div><div class="post-body"><div class="meta"><span class="cat">Guias</span><span class="date">6 min</span></div><h3>Kit essencial: 7 produtos para começar uma rotina Lumen</h3><p>Do bálsamo labial ao pincel kabuki: os básicos que elevam o resultado final.</p><a class="read-link" href="loja.html">Montar kit</a></div></article>
+    <article class="post" data-cat="maquilhagem"><div class="post-img"><img src="https://images.unsplash.com/photo-1583241801072-72205570c353?auto=format&fit=crop&w=900&q=80" alt="Blush e maquilhagem"></div><div class="post-body"><div class="meta"><span class="cat">Maquilhagem</span><span class="date">3 min</span></div><h3>Blush cremoso: o truque para pareceres naturalmente saudável</h3><p>Como aplicar, combinar tons e controlar a intensidade sem perder naturalidade.</p><a class="read-link" href="loja.html">Ver blushes</a></div></article>
+    <article class="post" data-cat="skincare"><div class="post-img"><img src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=900&q=80" alt="Produtos de skincare"></div><div class="post-body"><div class="meta"><span class="cat">Skincare</span><span class="date">5 min</span></div><h3>Limpeza suave: por que é a etapa que muda tudo</h3><p>Um bom gel de limpeza prepara a pele e melhora o aspeto da maquilhagem.</p><a class="read-link" href="loja.html">Ver cuidados</a></div></article>
+    <article class="post" data-cat="guias"><div class="post-img"><img src="https://images.unsplash.com/photo-1503174971373-b1f69850bded?auto=format&fit=crop&w=900&q=80" alt="Espelho e beleza"></div><div class="post-body"><div class="meta"><span class="cat">Guias</span><span class="date">4 min</span></div><h3>Organização de nécessaire: menos produtos, melhores escolhas</h3><p>Aprende a montar uma bolsa funcional para aulas, trabalho ou viagens.</p><a class="read-link" href="loja.html">Explorar loja</a></div></article>
+  </div>
+</section>
+
+<section class="section trends">
+  <div class="section-head">
+    <div><div class="label">Tendências</div><h2 class="title">O que está em alta</h2></div>
+    <p class="desc">Quatro ideias rápidas para transformar a tua rotina sem complicar.</p>
+  </div>
+  <div class="trend-grid">
+    <div class="trend"><span>01</span><h3>Glow limpo</h3><p>Pele cuidada, base leve e acabamento natural.</p></div>
+    <div class="trend"><span>02</span><h3>Lábios hidratados</h3><p>Bálsamos nutritivos com brilho subtil.</p></div>
+    <div class="trend"><span>03</span><h3>Olhar suave</h3><p>Sombras neutras para looks elegantes.</p></div>
+    <div class="trend"><span>04</span><h3>Rotina curta</h3><p>Poucos passos, produtos certos e consistência.</p></div>
+  </div>
+</section>
+
+<section class="newsletter">
+  <div class="label">Newsletter</div>
+  <h2 class="title">Recebe dicas Lumen no teu email</h2>
+  <p>Novidades, guias e sugestões de produtos para melhorares a tua rotina de beleza.</p>
+  <form class="nl-form" onsubmit="event.preventDefault(); alert('Obrigada por subscreveres a newsletter Lumen!'); this.reset();">
+    <input type="email" placeholder="O teu email" required>
+    <button type="submit">Subscrever</button>
+  </form>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div><div class="footer-logo">Lumen</div><p>Loja online criada para fins académicos de Web Marketing, Ciência de Dados para a Gestão, ISCAC.</p></div>
+    <div><h4>Navegação</h4><a href="index.html">Início</a><a href="loja.html">Loja</a><a href="blog.html">Blog</a></div>
+    <div><h4>Marca</h4><a href="servicos.html">Serviços</a><a href="sobre.html">Sobre Nós</a><a href="login.html">Área Cliente</a></div>
+    <div><h4>Contactos</h4><p>lumen@exemplo.pt<br>Coimbra, Portugal</p></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Lumen. Projeto académico.</span><span><a href="privacidade.html">Política de Privacidade</a> · <a href="termos.html">Termos</a></span></div>
+</footer>
+<script>
+const buttons=document.querySelectorAll('.filter');
+const posts=document.querySelectorAll('.post');
+buttons.forEach(btn=>btn.addEventListener('click',()=>{buttons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');const f=btn.dataset.filter;posts.forEach(p=>{p.style.display=(f==='all'||p.dataset.cat===f)?'block':'none';});}));
+</script>
+<div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+</body>
+</html>
