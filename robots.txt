@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hugogrou.github.io/Lumen/sitemap.xml
