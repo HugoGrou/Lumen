@@ -37,6 +37,11 @@
     .shop-count span{font-weight:500;color:var(--magenta);}
     .sort-select{font-family:var(--font-body);font-size:.8rem;color:var(--text);border:1px solid var(--border);background:var(--white);padding:8px 32px 8px 14px;border-radius:4px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c0325a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 
+    .shop-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .shop-search{min-width:min(330px,100%);padding:10px 16px;border:1px solid var(--border);border-radius:999px;background:var(--white);font-family:var(--font-body);font-size:.84rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+    .shop-search:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(192,50,90,.08);}
+    .btn-wish.active{border-color:var(--magenta);color:var(--magenta);background:rgba(192,50,90,.06);}
+
     /* ── LAYOUT ── */
     .shop-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 220px);}
 
@@ -96,11 +101,6 @@
     .skeleton-line.price{width:25%;height:14px;margin-top:6px;}
     @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-    /* ── GOOGLE SHEETS BANNER ── */
-    .sheets-notice{background:rgba(192,50,90,.06);border:1px solid rgba(192,50,90,.18);border-radius:4px;padding:14px 18px;margin-bottom:28px;display:flex;align-items:flex-start;gap:12px;font-size:.78rem;line-height:1.6;color:var(--muted);}
-    .sheets-notice strong{color:var(--magenta);}
-    .sheets-notice .icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
-    .sheets-notice a{color:var(--magenta);}
 
     /* ── NEWSLETTER ── */
     .nl-section{background:var(--pink-bg);padding:72px;text-align:center;}
@@ -202,12 +202,15 @@
   <h1 class="shop-title">Todos os produtos</h1>
   <div class="shop-meta">
     <p class="shop-count"><span id="visibleCount">13</span> produtos encontrados</p>
-    <select class="sort-select" onchange="sortProducts(this.value)">
-      <option value="default">Ordenar: Recomendado</option>
-      <option value="price-asc">Preço: menor para maior</option>
-      <option value="price-desc">Preço: maior para menor</option>
-      <option value="name-az">Nome A–Z</option>
-    </select>
+    <div class="shop-tools">
+      <input class="shop-search" id="searchInput" type="search" placeholder="Pesquisar produtos..." oninput="updateSearch(this.value)">
+      <select class="sort-select" onchange="sortProducts(this.value)">
+        <option value="default">Ordenar: Recomendado</option>
+        <option value="price-asc">Preço: menor para maior</option>
+        <option value="price-desc">Preço: maior para menor</option>
+        <option value="name-az">Nome A–Z</option>
+      </select>
+    </div>
   </div>
 </div>
 
@@ -303,13 +306,6 @@
     ╚══════════════════════════════════════════════════════════╝
     -->
 
-    <div class="sheets-notice" id="sheetsNotice" style="display:none">
-      <span class="icon">📊</span>
-      <div>
-        <strong>Google Sheets ativo!</strong> Os produtos estão a ser carregados da sua folha de cálculo.
-        Se precisar de alterar produtos, edite diretamente a <a href="#" id="sheetsLink" target="_blank">Google Sheet</a>.
-      </div>
-    </div>
 
     <div class="products-grid" id="productsGrid">
       <!-- Skeletons while loading -->
@@ -367,7 +363,7 @@
   <div class="footer-bottom">
     <p>© 2024 Lumen. Projeto académico — ISCAC.</p>
     <div class="footer-legal">
-      <a href="#">Privacidade</a>
+      <a href="privacidade.html">Privacidade</a>
       <a href="termos.html">Termos</a>
       <a href="acessibilidade.html">Acessibilidade</a>
     </div>
@@ -385,22 +381,50 @@ const SHEETDB_BASE = 'https://sheetdb.io/api/v1/uh28thaym36p8';
 const PRODUCTS_API = SHEETDB_BASE + '?sheet=Produtos';
 const USERS_API = SHEETDB_BASE + '?sheet=Clientes';
 const SALES_API = SHEETDB_BASE + '?sheet=Vendas';
-let allProducts=[], activeCat='todos', maxPrice=200, activeAcabamento=[], activeTipoPele=[];
+let allProducts=[], activeCat='todos', maxPrice=200, activeAcabamento=[], activeTipoPele=[], searchTerm='';
 function parsePrice(v){return Number(String(v||'0').replace('€','').replace(/\s/g,'').replace(',','.'))||0;}
 function formatPrice(v){return (Number(v)||0).toFixed(2).replace('.',',')+'€';}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));}
+function encodeName(s){return encodeURIComponent(String(s||''));}
 function getCart(){try{return JSON.parse(localStorage.getItem('lumen_cart'))||[]}catch{return[]}}
 function saveCart(c){localStorage.setItem('lumen_cart',JSON.stringify(c));updateCartUI();}
 function getUser(){try{return JSON.parse(sessionStorage.getItem('lumen_user'))}catch{return null}}
-window.addEventListener('DOMContentLoaded',async()=>{updateNavAuth();updateCartUI();document.getElementById('sheetsNotice').style.display='flex';document.getElementById('sheetsLink').href='https://docs.google.com/spreadsheets/d/1PW70ceRkj4hTqWlDKir_1COTpuHv8m51DMfPpiNHT9Y/edit';await loadProducts();});
+window.addEventListener('DOMContentLoaded',async()=>{updateNavAuth();updateCartUI();await loadProducts();});
 async function loadProducts(){try{let r=await fetch(PRODUCTS_API+'&_='+Date.now());let data=await r.json();if(!Array.isArray(data)||!data.length){r=await fetch(SHEETDB_BASE+'?_='+Date.now());data=await r.json();}allProducts=data.map(row=>{const nome=row['Nome do Produto']||row.Nome||row.nome||'';const precoRaw=row['Preço']||row.Preco||row.preco||'0';return{nome,categoria:String(row.Categoria||row['Categoria']||'').toLowerCase(),preco:parsePrice(precoRaw),imagem:row.Imagem||row['Imagem']||'',acabamento:String(row.Acabamento||row['Acabamento']||'').toLowerCase(),tipoPele:String(row['Tipo de Pele']||row.TipoPele||'').toLowerCase()}}).filter(p=>p.nome);renderProdutos();}catch(e){console.error(e);document.getElementById('productsGrid').innerHTML='<div class="empty-state"><p>Não foi possível carregar produtos.</p><span>Confirme a API SheetDB.</span></div>';}}
-function renderProdutos(){document.getElementById('loadingSkeletons')?.remove();const grid=document.getElementById('productsGrid');let filtered=allProducts.filter(p=>{if(activeCat!=='todos'&&p.categoria!==activeCat)return false;if(p.preco>maxPrice)return false;if(activeAcabamento.length&&!activeAcabamento.includes(p.acabamento))return false;if(activeTipoPele.length&&!activeTipoPele.includes(p.tipoPele))return false;return true;});document.getElementById('visibleCount').textContent=filtered.length;if(!filtered.length){grid.innerHTML='<div class="empty-state"><p>Nenhum produto encontrado</p><span>Tente ajustar os filtros.</span></div>';return;}grid.innerHTML=filtered.map((p,idx)=>`<div class="product-card"><div class="product-img">${p.categoria==='lumen'?'<span class="product-badge">✦ Lumen</span>':''}${p.imagem?`<img src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'product-img-placeholder\'>💄</div>'">`:'<div class="product-img-placeholder">💄</div>'}</div><div class="product-info"><p class="product-cat">${p.categoria?p.categoria.charAt(0).toUpperCase()+p.categoria.slice(1):'Produto'}</p><p class="product-name">${p.nome}</p><p class="product-price">${formatPrice(p.preco)}</p><div class="product-action"><button class="btn-cart" onclick="addToCart(${idx})">Adicionar</button><button class="btn-wish" title="Guardar">♡</button></div></div></div>`).join('');}
+function renderProdutos(){
+  document.getElementById('loadingSkeletons')?.remove();
+  const grid=document.getElementById('productsGrid');
+  let filtered=allProducts.filter(p=>{
+    if(activeCat!=='todos'&&p.categoria!==activeCat)return false;
+    if(p.preco>maxPrice)return false;
+    if(searchTerm&&!p.nome.toLowerCase().includes(searchTerm)&&!p.categoria.toLowerCase().includes(searchTerm))return false;
+    if(activeAcabamento.length&&!activeAcabamento.includes(p.acabamento))return false;
+    if(activeTipoPele.length&&!activeTipoPele.includes(p.tipoPele))return false;
+    return true;
+  });
+  document.getElementById('visibleCount').textContent=filtered.length;
+  if(!filtered.length){grid.innerHTML='<div class="empty-state"><p>Nenhum produto encontrado</p><span>Tente ajustar a pesquisa ou os filtros.</span></div>';return;}
+  grid.innerHTML=filtered.map(p=>`<div class="product-card"><div class="product-img">${p.categoria==='lumen'?'<span class="product-badge">✦ Lumen</span>':''}${p.imagem?`<img src="${esc(p.imagem)}" alt="${esc(p.nome)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'product-img-placeholder\'>💄</div>'">`:'<div class="product-img-placeholder">💄</div>'}</div><div class="product-info"><p class="product-cat">${esc(p.categoria?p.categoria.charAt(0).toUpperCase()+p.categoria.slice(1):'Produto')}</p><p class="product-name">${esc(p.nome)}</p><p class="product-price">${formatPrice(p.preco)}</p><div class="product-action"><button class="btn-cart" onclick="addToCartByName('${encodeName(p.nome)}')">Adicionar</button><button class="btn-wish" onclick="toggleWish(this)" title="Guardar">♡</button></div></div></div>`).join('');
+}
 function filterCat(cat,el){activeCat=cat;document.querySelectorAll('.sidebar-cats a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');renderProdutos();}
 function updatePrice(val){maxPrice=parseFloat(val);document.getElementById('priceMax').textContent=val+'€';renderProdutos();}
 function updateAcabamento(){activeAcabamento=[...document.querySelectorAll('input[onchange="updateAcabamento()"]:checked')].map(cb=>cb.value);renderProdutos();}
 function updateTipoPele(){activeTipoPele=[...document.querySelectorAll('input[onchange="updateTipoPele()"]:checked')].map(cb=>cb.value);renderProdutos();}
 function sortProducts(val){if(val==='price-asc')allProducts.sort((a,b)=>a.preco-b.preco);else if(val==='price-desc')allProducts.sort((a,b)=>b.preco-a.preco);else if(val==='name-az')allProducts.sort((a,b)=>a.nome.localeCompare(b.nome,'pt'));renderProdutos();}
+function updateSearch(v){searchTerm=String(v||'').trim().toLowerCase();renderProdutos();}
+function toggleWish(btn){btn.classList.toggle('active');btn.textContent=btn.classList.contains('active')?'♥':'♡';}
 function toggleFilter(btn){const body=btn.nextElementSibling,arrow=btn.querySelector('.arrow'),isOpen=body.classList.contains('collapsed');body.classList.toggle('collapsed',!isOpen);arrow.style.transform=isOpen?'rotate(180deg)':'';}
-function addToCart(index){const p=allProducts[index],cart=getCart(),id=p.nome,item=cart.find(i=>i.id===id);if(item)item.qtd+=1;else cart.push({id,nome:p.nome,preco:p.preco,imagem:p.imagem,qtd:1});if(typeof gtag==='function'){gtag('event','add_to_cart',{currency:'EUR',value:p.preco,items:[{item_name:p.nome,item_category:p.categoria||'Produto',price:p.preco,quantity:1}]});}saveCart(cart);const t=document.getElementById('cartToast');t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function addToCartByName(encodedName){
+  const name=decodeURIComponent(encodedName);
+  const p=allProducts.find(prod=>prod.nome===name);
+  if(!p)return;
+  const cart=getCart(),id=p.nome,item=cart.find(i=>i.id===id);
+  if(item)item.qtd+=1;else cart.push({id,nome:p.nome,preco:p.preco,imagem:p.imagem,qtd:1});
+  if(typeof gtag==='function'){gtag('event','add_to_cart',{currency:'EUR',value:p.preco,items:[{item_name:p.nome,item_category:p.categoria||'Produto',price:p.preco,quantity:1}]});}
+  saveCart(cart);
+  const t=document.getElementById('cartToast');
+  t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
+}
 function removeFromCart(id){saveCart(getCart().filter(i=>i.id!==id));}
 function openCart(){document.getElementById('cartDrawer').classList.add('open');}
 function closeCart(){document.getElementById('cartDrawer').classList.remove('open');}
