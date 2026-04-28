@@ -17,4 +17,60 @@
 <h2>3. Gestão de cookies</h2>
 <p>Pode aceitar ou recusar cookies analíticos no banner apresentado no site. Também pode limpar cookies nas definições do navegador.</p>
 <h2>4. Google Analytics</h2>
-<p>Os dados analíticos são usados apenas para compreender o desempenho do site e melhorar a navegação.</p><a class="back" href="index.html">Voltar ao início</a></article></main><footer class="footer"><div class="brand">Lumen</div><p>Projeto académico — ISCAC, Coimbra.</p><p><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a> · <a href="cookies.html">Cookies</a> · <a href="envios.html">Envios</a> · <a href="reembolsos.html">Reembolsos</a> · <a href="acessibilidade.html">Acessibilidade</a></p></footer><div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script></body></html>
+<p>Os dados analíticos são usados apenas para compreender o desempenho do site e melhorar a navegação.</p><a class="back" href="index.html">Voltar ao início</a></article></main><footer class="footer"><div class="brand">Lumen</div><p>Projeto académico — ISCAC, Coimbra.</p><p><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a> · <a href="cookies.html">Cookies</a> · <a href="envios.html">Envios</a> · <a href="reembolsos.html">Reembolsos</a> · <a href="acessibilidade.html">Acessibilidade</a></p></footer><div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+<script id="lumen-global-session">
+(function(){
+  function readJson(value){ try { return JSON.parse(value); } catch(e){ return null; } }
+  function getAuthUser(){
+    return readJson(sessionStorage.getItem('lumen_user')) ||
+           readJson(localStorage.getItem('lumen_user')) ||
+           readJson(localStorage.getItem('user')) || null;
+  }
+  function getDisplayName(user){
+    return (user && (user.nome || user.Nome || user.name || user.Email || user.email)) || '';
+  }
+  function createUserArea(loginBtn){
+    var area = document.getElementById('nav-user-area');
+    if(area) return area;
+    if(!loginBtn) return null;
+    area = document.createElement('div');
+    area.id = 'nav-user-area';
+    area.className = 'nav-user';
+    area.style.display = 'none';
+    area.style.alignItems = 'center';
+    area.style.gap = '10px';
+    area.style.whiteSpace = 'nowrap';
+    area.innerHTML = '<span id="nav-user-name" class="nav-user-name" style="font-size:.82rem;color:var(--magenta,#c0325a);font-weight:500"></span><button type="button" onclick="logout()" class="nav-logout" style="font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:none;background:none;font-family:inherit">Sair</button>';
+    loginBtn.insertAdjacentElement('afterend', area);
+    return area;
+  }
+  window.updateLumenSessionNav = function(){
+    var user = getAuthUser();
+    var loginBtn = document.getElementById('nav-login-btn') || document.querySelector('a.login[href*="login"], a.login-btn[href*="login"], a.nav-btn[href*="login"]');
+    var area = document.getElementById('nav-user-area') || createUserArea(loginBtn);
+    var name = document.getElementById('nav-user-name');
+    if(user){
+      if(loginBtn) loginBtn.style.display = 'none';
+      if(area) area.style.display = 'flex';
+      if(name) name.textContent = 'Olá, ' + getDisplayName(user) + ' ✦';
+    } else {
+      if(loginBtn) loginBtn.style.display = '';
+      if(area) area.style.display = 'none';
+    }
+  };
+  window.logout = function(){
+    sessionStorage.removeItem('lumen_user');
+    localStorage.removeItem('lumen_user');
+    localStorage.removeItem('user');
+    window.updateLumenSessionNav();
+    window.location.href = 'index.html';
+  };
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', window.updateLumenSessionNav);
+  } else {
+    window.updateLumenSessionNav();
+  }
+})();
+</script>
+
+</body></html>
