@@ -96,13 +96,13 @@
   </section>
 
   <section class="booking" id="marcar">
-    <div class="eyebrow">Marcação</div><h2 class="section-title">Agenda a tua experiência</h2><p class="section-desc">Preenche o formulário e a tua marcação fica registada automaticamente na base de dados Lumen.</p>
+    <div class="eyebrow">Marcação</div><h2 class="section-title">Agenda a tua experiência</h2><p class="section-desc">Preenche o formulário e escolhe um horário disponível. As marcações funcionam entre as 09:00 e as 19:00; quando um horário é reservado, deixa de ficar disponível para outros clientes.</p>
     <form class="booking-panel" onsubmit="sendBooking(event)">
       <input id="bookingName" placeholder="Nome" required>
       <input id="bookingEmail" type="email" placeholder="Email" required>
       <select id="bookingService" required><option value="">Escolher serviço</option><option>Maquilhagem Profissional</option><option>Consultoria Beauty</option><option>Tratamento Facial</option><option>Workshop Makeup</option><option>Kit Personalizado</option><option>Consultoria Online</option><option>Ritual Lumen Glow</option></select>
       <input id="bookingDate" type="date" required>
-      <input id="bookingTime" type="time" required>
+      <select id="bookingTime" required disabled><option value="">Escolha primeiro uma data</option></select>
       <input id="bookingPhone" placeholder="Telefone opcional">
       <button id="bookingSubmit" type="submit">Enviar pedido de marcação</button>
       <p id="bookingMsg" class="booking-msg" aria-live="polite"></p>
@@ -123,6 +123,93 @@
     function toggleMenu(){document.getElementById('navLinks').classList.toggle('open')}
     function selectService(name){document.getElementById('bookingService').value=name;document.getElementById('marcar').scrollIntoView({behavior:'smooth'});}
     const SHEETDB_API='https://sheetdb.io/api/v1/uh28thaym36p8';
+    const OPENING_HOUR=9;
+    const CLOSING_HOUR=19;
+    const SLOT_MINUTES=30;
+    let bookedSlots=[];
+
+    function normaliseTime(value){
+      if(!value) return '';
+      const parts=String(value).trim().split(':');
+      if(parts.length<2) return value;
+      return `${parts[0].padStart(2,'0')}:${parts[1].padStart(2,'0')}`;
+    }
+
+    function formatDateForSheet(dateValue){
+      if(!dateValue) return '';
+      const [y,m,d]=dateValue.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function generateSlots(){
+      const slots=[];
+      for(let mins=OPENING_HOUR*60; mins<CLOSING_HOUR*60; mins+=SLOT_MINUTES){
+        const h=String(Math.floor(mins/60)).padStart(2,'0');
+        const m=String(mins%60).padStart(2,'0');
+        slots.push(`${h}:${m}`);
+      }
+      return slots;
+    }
+
+    async function fetchBookedSlots(dateValue){
+      const selectedDatePT=formatDateForSheet(dateValue);
+      bookedSlots=[];
+      try{
+        const res=await fetch(`${SHEETDB_API}?sheet=Serviços`);
+        if(!res.ok) throw new Error('Não foi possível carregar marcações');
+        const rows=await res.json();
+        bookedSlots=(Array.isArray(rows)?rows:[])
+          .filter(row=>String(row.Data||'').trim()===selectedDatePT || String(row.Data||'').trim()===dateValue)
+          .map(row=>normaliseTime(row.Hora||row['Hora']));
+      }catch(err){
+        bookedSlots=[];
+        const msg=document.getElementById('bookingMsg');
+        if(msg){
+          msg.className='booking-msg err';
+          msg.textContent='Não foi possível consultar horários já reservados. Tenta novamente.';
+        }
+      }
+    }
+
+    async function updateAvailableTimes(){
+      const dateInput=document.getElementById('bookingDate');
+      const timeSelect=document.getElementById('bookingTime');
+      const msg=document.getElementById('bookingMsg');
+      const selectedDate=dateInput.value;
+      timeSelect.innerHTML='';
+
+      if(!selectedDate){
+        timeSelect.disabled=true;
+        timeSelect.innerHTML='<option value="">Escolha primeiro uma data</option>';
+        return;
+      }
+
+      if(msg){
+        msg.className='booking-msg';
+        msg.textContent='A verificar horários disponíveis...';
+      }
+
+      await fetchBookedSlots(selectedDate);
+      const freeSlots=generateSlots().filter(slot=>!bookedSlots.includes(slot));
+
+      if(freeSlots.length===0){
+        timeSelect.disabled=true;
+        timeSelect.innerHTML='<option value="">Sem horários disponíveis neste dia</option>';
+        if(msg){
+          msg.className='booking-msg err';
+          msg.textContent='Este dia já não tem horários disponíveis. Escolhe outra data.';
+        }
+        return;
+      }
+
+      timeSelect.disabled=false;
+      timeSelect.innerHTML='<option value="">Escolher horário disponível</option>' + freeSlots.map(slot=>`<option value="${slot}">${slot}</option>`).join('');
+      if(msg){
+        msg.className='booking-msg';
+        msg.textContent='Horários disponíveis entre as 09:00 e as 19:00.';
+      }
+    }
+
     async function sendBooking(e){
       e.preventDefault();
       const form=e.target;
@@ -132,14 +219,23 @@
       const em=document.getElementById('bookingEmail').value.trim();
       const s=document.getElementById('bookingService').value;
       const d=document.getElementById('bookingDate').value;
-      const h=document.getElementById('bookingTime').value;
+      const h=normaliseTime(document.getElementById('bookingTime').value);
       const p=document.getElementById('bookingPhone').value.trim();
 
       msg.className='booking-msg';
-      msg.textContent='A enviar marcação...';
+      msg.textContent='A confirmar disponibilidade...';
       btn.disabled=true;
 
       try{
+        await fetchBookedSlots(d);
+        if(bookedSlots.includes(h)){
+          msg.className='booking-msg err';
+          msg.textContent='Este horário acabou de ser reservado. Escolhe outro horário disponível.';
+          await updateAvailableTimes();
+          return;
+        }
+
+        msg.textContent='A guardar marcação...';
         const res=await fetch(`${SHEETDB_API}?sheet=Serviços`,{
           method:'POST',
           headers:{'Content-Type':'application/json'},
@@ -147,7 +243,7 @@
             data:{
               'Nome':n,
               'Email do Cliente':em,
-              'Data':d,
+              'Data':formatDateForSheet(d),
               'Hora':h,
               'Telefone':p,
               'Serviço':s
@@ -157,8 +253,10 @@
         if(!res.ok){throw new Error('Erro ao guardar no Google Sheets');}
         if(window.gtag){gtag('event','service_booking',{service_name:s});}
         msg.className='booking-msg ok';
-        msg.textContent='Marcação enviada com sucesso. A equipa Lumen irá confirmar por email.';
+        msg.textContent='Marcação enviada com sucesso. Esse horário ficou bloqueado para novas reservas.';
         form.reset();
+        document.getElementById('bookingTime').disabled=true;
+        document.getElementById('bookingTime').innerHTML='<option value="">Escolha primeiro uma data</option>';
       }catch(err){
         msg.className='booking-msg err';
         msg.textContent='Não foi possível guardar a marcação. Verifica a aba Serviços no Google Sheets e tenta novamente.';
@@ -166,66 +264,12 @@
         btn.disabled=false;
       }
     }
+
+    document.getElementById('bookingDate')?.addEventListener('change', updateAvailableTimes);
     function updateNavAuth(){let u=null;try{u=JSON.parse(sessionStorage.getItem('lumen_user'));}catch(e){}const b=document.getElementById('nav-login-btn');const a=document.getElementById('nav-user-area');const n=document.getElementById('nav-user-name');if(u&&u.Nome){if(b)b.style.display='none';if(a)a.style.display='flex';if(n)n.textContent=u.Nome}else{if(b)b.style.display='inline-flex';if(a)a.style.display='none'}}
     function logout(){sessionStorage.removeItem('lumen_user');localStorage.removeItem('lumen_user');updateNavAuth()}
     const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));updateNavAuth();
   </script>
 <div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
-
-<script id="lumen-global-session">
-(function(){
-  function readUser(){
-    var keys=['lumen_user','user'];
-    for(var i=0;i<keys.length;i++){
-      try{
-        var v=sessionStorage.getItem(keys[i]) || localStorage.getItem(keys[i]);
-        if(v){ return JSON.parse(v); }
-      }catch(e){}
-    }
-    return null;
-  }
-  function userLabel(user){
-    if(!user) return '';
-    return user.nome || user.Nome || user.name || user.Name || user.email || user.Email || '';
-  }
-  function ensureUserArea(loginBtn){
-    var area=document.getElementById('nav-user-area') || document.querySelector('.nav-user');
-    if(!area && loginBtn){
-      area=document.createElement('div');
-      area.id='nav-user-area';
-      area.className='nav-user';
-      area.style.display='none';
-      area.style.alignItems='center';
-      area.style.gap='10px';
-      area.style.whiteSpace='nowrap';
-      area.innerHTML='<span id="nav-user-name" class="nav-user-name" style="font-size:.82rem;color:var(--magenta,#c0325a);font-weight:500"></span><button type="button" onclick="logout()" class="nav-logout" style="font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:none;background:none;font-family:inherit">Sair</button>';
-      loginBtn.insertAdjacentElement('afterend', area);
-    }
-    return area;
-  }
-  window.updateNavAuth = function(){
-    var user=readUser();
-    var loginBtn=document.getElementById('nav-login-btn') || document.querySelector('a.login[href="login.html"], a.login-btn[href="login.html"], a.nav-btn[href="login.html"]');
-    var area=ensureUserArea(loginBtn);
-    var name=document.getElementById('nav-user-name') || (area ? area.querySelector('.nav-user-name') : null);
-    if(user){
-      if(loginBtn) loginBtn.style.display='none';
-      if(area) area.style.display='flex';
-      if(name) name.textContent='Olá, '+userLabel(user)+' ✦';
-    }else{
-      if(loginBtn) loginBtn.style.display='inline-flex';
-      if(area) area.style.display='none';
-    }
-  };
-  window.logout = function(){
-    try{sessionStorage.removeItem('lumen_user');localStorage.removeItem('lumen_user');localStorage.removeItem('user');}catch(e){}
-    window.updateNavAuth();
-    window.location.href='index.html';
-  };
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', window.updateNavAuth);
-  else window.updateNavAuth();
-})();
-</script>
-
 </body>
 </html>
