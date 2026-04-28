@@ -116,7 +116,14 @@
       .auth-form-wrap { padding:80px 24px 48px; }
       footer { padding:48px 24px 28px; } .footer-grid { grid-template-columns:1fr; gap:32px; }
     }
-  </style>
+  
+/* Lumen auth nav: mostra o nome da cliente em todas as páginas */
+.lumen-auth-area{display:none;align-items:center;gap:10px;flex-shrink:0}
+.lumen-auth-name{font-size:.82rem;color:var(--magenta,#c0325a);font-weight:500;white-space:nowrap}
+.lumen-auth-logout{font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:0;background:transparent;font-family:inherit;padding:0}
+.lumen-auth-logout:hover{color:var(--magenta,#c0325a)}
+@media(max-width:620px){.lumen-auth-area{flex-wrap:wrap}.lumen-auth-name{font-size:.8rem}}
+</style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
   <script>
@@ -286,5 +293,84 @@ async function handleLogin(){const email=document.getElementById('login-email').
 async function handleRegister(){const nome=(document.getElementById('reg-name').value+' '+document.getElementById('reg-surname').value).trim(),email=document.getElementById('reg-email').value.trim(),pw=document.getElementById('reg-pw').value,pw2=document.getElementById('reg-pw2').value,terms=document.getElementById('terms').checked;if(!nome||!email||!pw||!pw2)return showError('register-error','Preencha todos os campos.');if(pw.length<6)return showError('register-error','A palavra-passe deve ter pelo menos 6 caracteres.');if(pw!==pw2)return showError('register-error','As palavras-passe não coincidem.');if(!terms)return showError('register-error','Aceite os Termos e Condições.');setLoading('register-btn',true);try{const users=await fetchUsers().catch(()=>[]);if(users.some(u=>String(u.Email||u.email||'').toLowerCase()===email.toLowerCase())){showError('register-error','Este email já está registado.');setLoading('register-btn',false);return;}const novo={Nome:nome,Email:email,Password:pw,Data:new Date().toLocaleDateString('pt-PT')};const res=await fetch(USERS_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:novo})});if(!res.ok)throw new Error('SheetDB');setUser({nome,email});updateNavAuth();showSuccess('register',nome);}catch(e){console.error(e);showError('register-error','Não foi possível criar conta. Confirme a aba Clientes.');}setLoading('register-btn',false);}
 </script>
 <div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+
+<script id="lumen-auth-nav-script">
+(function(){
+  function safeParse(value){
+    try{return value ? JSON.parse(value) : null;}catch(e){return null;}
+  }
+  function getLumenUser(){
+    return safeParse(sessionStorage.getItem('lumen_user')) ||
+           safeParse(localStorage.getItem('lumen_user')) ||
+           safeParse(localStorage.getItem('user'));
+  }
+  function userDisplayName(user){
+    if(!user) return '';
+    return user.nome || user.Nome || user.name || user.Name || user.email || user.Email || '';
+  }
+  function ensureAuthArea(nav, loginLink){
+    var area = document.getElementById('nav-user-area');
+    if(!area){
+      area = document.createElement('div');
+      area.id = 'nav-user-area';
+      area.className = 'lumen-auth-area';
+      area.innerHTML = '<span id="nav-user-name" class="lumen-auth-name"></span><button type="button" class="lumen-auth-logout">Sair</button>';
+      if(loginLink && loginLink.parentNode){
+        loginLink.parentNode.insertBefore(area, loginLink.nextSibling);
+      }else{
+        nav.appendChild(area);
+      }
+    }
+    area.classList.add('lumen-auth-area');
+    var name = document.getElementById('nav-user-name');
+    if(!name){
+      name = document.createElement('span');
+      name.id = 'nav-user-name';
+      area.insertBefore(name, area.firstChild);
+    }
+    name.classList.add('lumen-auth-name');
+    var btn = area.querySelector('button');
+    if(!btn){
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Sair';
+      area.appendChild(btn);
+    }
+    btn.classList.add('lumen-auth-logout');
+    btn.onclick = window.logout;
+    return area;
+  }
+  function updateNavAuth(){
+    var nav = document.querySelector('nav');
+    if(!nav) return;
+    var loginLink = document.getElementById('nav-login-btn') || nav.querySelector('a[href="login.html"]');
+    if(loginLink) loginLink.id = 'nav-login-btn';
+    var area = ensureAuthArea(nav, loginLink);
+    var name = document.getElementById('nav-user-name');
+    var user = getLumenUser();
+    var display = userDisplayName(user);
+    if(user && display){
+      if(loginLink) loginLink.style.display = 'none';
+      area.style.display = 'flex';
+      if(name) name.textContent = 'Olá, ' + display + ' ✦';
+    }else{
+      if(loginLink) loginLink.style.display = '';
+      area.style.display = 'none';
+    }
+  }
+  window.getLumenUser = getLumenUser;
+  window.updateNavAuth = updateNavAuth;
+  window.logout = function(){
+    sessionStorage.removeItem('lumen_user');
+    localStorage.removeItem('lumen_user');
+    updateNavAuth();
+  };
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', updateNavAuth);
+  }else{
+    updateNavAuth();
+  }
+})();
+</script>
 </body>
 </html>

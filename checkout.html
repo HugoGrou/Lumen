@@ -9,6 +9,13 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-9W57080ZKR');</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}:root{--pink:#f2c4ce;--pink2:#f7dde3;--magenta:#c0325a;--dark:#2a1a1a;--text:#3a2020;--muted:#8a6060;--bg:#fdf8f8;--border:#e8d0d4;--display:'Cormorant Garamond',serif;--body:'Jost',sans-serif}body{font-family:var(--body);background:var(--bg);color:var(--text)}nav{height:64px;background:var(--pink);display:flex;align-items:center;justify-content:space-between;padding:0 40px}.logo{font-family:var(--display);font-size:1.8rem;font-weight:600;letter-spacing:.08em;color:var(--magenta);text-decoration:none}.links{display:flex;gap:24px}.links a{color:var(--magenta);text-decoration:none}.hero{background:var(--pink2);text-align:center;padding:55px 24px;border-bottom:1px solid var(--border)}.label{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--magenta);margin-bottom:12px}h1{font-family:var(--display);font-size:clamp(2.3rem,5vw,4rem);font-weight:300;color:var(--dark)}.wrap{max-width:1120px;margin:auto;padding:52px 24px 80px;display:grid;grid-template-columns:1fr 390px;gap:34px}.card{background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 16px 50px rgba(192,50,90,.06)}.form{padding:34px}.summary{padding:28px}h2,h3{font-family:var(--display);font-weight:300;color:var(--dark)}h2{font-size:1.9rem;margin-bottom:8px}h3{font-size:1.6rem;margin-bottom:18px}.sub{font-size:.86rem;line-height:1.8;color:var(--muted);margin-bottom:26px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.full{grid-column:1/-1}label{display:block;font-size:.7rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}input,textarea{width:100%;padding:13px 15px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--dark);font-family:var(--body);font-size:.9rem;outline:none}input:focus,textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(192,50,90,.08)}textarea{resize:vertical;min-height:100px}.btn{width:100%;border:none;background:var(--magenta);color:white;font-family:var(--body);font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;padding:15px 22px;border-radius:4px;margin-top:22px;cursor:pointer}.btn:hover{background:#a02048}.btn:disabled{opacity:.65;cursor:not-allowed}.back{display:inline-block;margin-top:18px;color:var(--magenta);font-size:.82rem;text-decoration:none}.item{display:grid;grid-template-columns:54px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}.item img{width:54px;height:54px;object-fit:cover;border-radius:4px;background:var(--pink2)}.item strong{display:block;font-family:var(--display);font-size:1rem;font-weight:500;color:var(--dark);line-height:1.2}.item span{font-size:.76rem;color:var(--muted)}.price{font-size:.86rem;color:var(--magenta);font-weight:500}.total{display:flex;justify-content:space-between;align-items:center;padding-top:20px;font-family:var(--display);font-size:1.5rem}.total strong{color:var(--magenta)}.notice{margin-top:18px;background:rgba(192,50,90,.06);border:1px solid rgba(192,50,90,.18);border-radius:4px;padding:13px 14px;color:var(--muted);font-size:.8rem;line-height:1.6}.error{display:none;margin-bottom:20px;background:rgba(192,50,90,.08);border:1px solid rgba(192,50,90,.3);color:var(--magenta);padding:12px 14px;border-radius:4px;font-size:.86rem}.error.show{display:block}footer{background:#2a1010;padding:40px 24px;text-align:center;color:rgba(255,255,255,.45);font-size:.78rem}footer a{color:var(--pink);text-decoration:none}@media(max-width:900px){nav{padding:0 20px}.links{display:none}.wrap{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.form{padding:26px}}
+
+/* Lumen auth nav: mostra o nome da cliente em todas as páginas */
+.lumen-auth-area{display:none;align-items:center;gap:10px;flex-shrink:0}
+.lumen-auth-name{font-size:.82rem;color:var(--magenta,#c0325a);font-weight:500;white-space:nowrap}
+.lumen-auth-logout{font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:0;background:transparent;font-family:inherit;padding:0}
+.lumen-auth-logout:hover{color:var(--magenta,#c0325a)}
+@media(max-width:620px){.lumen-auth-area{flex-wrap:wrap}.lumen-auth-name{font-size:.8rem}}
 </style>
 </head>
 <body>
@@ -35,6 +42,85 @@ document.getElementById('total').textContent=money(total);
 document.getElementById('items').innerHTML=cart.length?cart.map(i=>`<div class="item">${i.imagem?`<img src="${i.imagem}" alt="${i.nome}">`:'<img alt="Produto">'}<div><strong>${i.nome}</strong><span>${i.qtd} × ${money(i.preco)}</span></div><div class="price">${money(i.preco*i.qtd)}</div></div>`).join(''):'<p class="sub">Sem produtos no carrinho.</p>';
 if(user&&(user.Nome||user.nome))document.getElementById('nome').value=user.Nome||user.nome;
 document.getElementById('checkoutForm').addEventListener('submit',async function(e){e.preventDefault();clearError();const nome=document.getElementById('nome').value.trim();const telefone=document.getElementById('telefone').value.trim();const morada=document.getElementById('morada').value.trim();const codigoPostal=document.getElementById('codigoPostal').value.trim();const cidade=document.getElementById('cidade').value.trim();const obs=document.getElementById('observacoes').value.trim();if(!nome||!telefone||!morada||!codigoPostal||!cidade){showError('Preencha todos os campos obrigatórios da morada.');return}submitBtn.disabled=true;submitBtn.textContent='A registar...';const produtos=cart.map(i=>`${i.qtd}x ${i.nome}`).join(' | ');const venda={'Valor (€)':money(total),'Email do Cliente':(user&&(user.Email||user.email))||'',Data:new Date().toLocaleDateString('pt-PT'),Hora:new Date().toLocaleTimeString('pt-PT'),Nome:nome,Telefone:telefone,Morada:morada,'Código Postal':codigoPostal,Cidade:cidade,'Observações':obs?`${obs} | Produtos: ${produtos}`:`Produtos: ${produtos}`};try{const r=await fetch(SALES_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:venda})});if(!r.ok)throw new Error(await r.text());if(typeof gtag==='function')gtag('event','purchase',{transaction_id:'LUMEN-'+Date.now(),currency:'EUR',value:total,items:cart.map(i=>({item_name:i.nome,price:i.preco,quantity:i.qtd}))});localStorage.removeItem('lumen_cart');localStorage.removeItem('cart');localStorage.removeItem('lumenCart');alert('Encomenda registada com sucesso!');location.href='loja.html'}catch(err){console.error(err);showError('Não foi possível registar a encomenda. Confirme se a aba se chama Vendas e se as colunas têm exatamente estes nomes: Valor (€), Email do Cliente, Data, Hora, Nome, Telefone, Morada, Código Postal, Cidade e Observações.');submitBtn.disabled=false;submitBtn.textContent='Confirmar Encomenda'}});
+</script>
+
+<script id="lumen-auth-nav-script">
+(function(){
+  function safeParse(value){
+    try{return value ? JSON.parse(value) : null;}catch(e){return null;}
+  }
+  function getLumenUser(){
+    return safeParse(sessionStorage.getItem('lumen_user')) ||
+           safeParse(localStorage.getItem('lumen_user')) ||
+           safeParse(localStorage.getItem('user'));
+  }
+  function userDisplayName(user){
+    if(!user) return '';
+    return user.nome || user.Nome || user.name || user.Name || user.email || user.Email || '';
+  }
+  function ensureAuthArea(nav, loginLink){
+    var area = document.getElementById('nav-user-area');
+    if(!area){
+      area = document.createElement('div');
+      area.id = 'nav-user-area';
+      area.className = 'lumen-auth-area';
+      area.innerHTML = '<span id="nav-user-name" class="lumen-auth-name"></span><button type="button" class="lumen-auth-logout">Sair</button>';
+      if(loginLink && loginLink.parentNode){
+        loginLink.parentNode.insertBefore(area, loginLink.nextSibling);
+      }else{
+        nav.appendChild(area);
+      }
+    }
+    area.classList.add('lumen-auth-area');
+    var name = document.getElementById('nav-user-name');
+    if(!name){
+      name = document.createElement('span');
+      name.id = 'nav-user-name';
+      area.insertBefore(name, area.firstChild);
+    }
+    name.classList.add('lumen-auth-name');
+    var btn = area.querySelector('button');
+    if(!btn){
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Sair';
+      area.appendChild(btn);
+    }
+    btn.classList.add('lumen-auth-logout');
+    btn.onclick = window.logout;
+    return area;
+  }
+  function updateNavAuth(){
+    var nav = document.querySelector('nav');
+    if(!nav) return;
+    var loginLink = document.getElementById('nav-login-btn') || nav.querySelector('a[href="login.html"]');
+    if(loginLink) loginLink.id = 'nav-login-btn';
+    var area = ensureAuthArea(nav, loginLink);
+    var name = document.getElementById('nav-user-name');
+    var user = getLumenUser();
+    var display = userDisplayName(user);
+    if(user && display){
+      if(loginLink) loginLink.style.display = 'none';
+      area.style.display = 'flex';
+      if(name) name.textContent = 'Olá, ' + display + ' ✦';
+    }else{
+      if(loginLink) loginLink.style.display = '';
+      area.style.display = 'none';
+    }
+  }
+  window.getLumenUser = getLumenUser;
+  window.updateNavAuth = updateNavAuth;
+  window.logout = function(){
+    sessionStorage.removeItem('lumen_user');
+    localStorage.removeItem('lumen_user');
+    updateNavAuth();
+  };
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', updateNavAuth);
+  }else{
+    updateNavAuth();
+  }
+})();
 </script>
 </body>
 </html>
