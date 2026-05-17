@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lumen – Loja</title>
+  <meta name="description" content="Explora o catálogo Lumen: bases, blushes, séruns, pincéis e muito mais. Filtra por categoria, preço e marca."/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Loja – Lumen | Produtos de Beleza e Cosmética"/>
+  <meta property="og:description" content="Explora o catálogo Lumen: bases, blushes, séruns, pincéis e muito mais. Filtra por categoria, preço e marca."/>
+  <meta property="og:image" content="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200"/>
+  <meta property="og:locale" content="pt_PT"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Loja – Lumen | Produtos de Beleza e Cosmética"/>
+  <meta name="twitter:description" content="Explora o catálogo Lumen: bases, blushes, séruns, pincéis e muito mais. Filtra por categoria, preço e marca."/>
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200"/>
+  <title>Loja – Lumen | Produtos de Beleza e Cosmética</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -169,6 +180,23 @@
 .lumen-auth-logout{font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:0;background:transparent;font-family:inherit;padding:0}
 .lumen-auth-logout:hover{color:var(--magenta,#c0325a)}
 @media(max-width:620px){.lumen-auth-area{flex-wrap:wrap}.lumen-auth-name{font-size:.8rem}}
+
+/* == COOKIE BANNER == */
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:#2a1010;color:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;z-index:9999;box-shadow:0 -4px 24px rgba(0,0,0,.22);transform:translateY(110%);opacity:0;transition:transform .4s ease,opacity .4s ease;pointer-events:none}
+.cookie-banner.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.cookie-banner p{font-size:.82rem;line-height:1.65;color:rgba(255,255,255,.8);flex:1;min-width:200px;margin:0}
+.cookie-banner p strong{color:#fff}
+.cookie-banner a{color:#f2c4ce;text-decoration:underline}
+.cookie-actions{display:flex;gap:10px;flex-shrink:0}
+.cookie-accept,.cookie-reject{border:none;border-radius:4px;padding:9px 20px;font-family:inherit;font-size:.74rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.cookie-accept{background:#c0325a;color:#fff}
+.cookie-accept:hover{background:#a02048}
+.cookie-reject{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
+.cookie-reject:hover{background:rgba(255,255,255,.2)}
+
+/* == MENU MOBILE == */
+.mob-btn{display:none;background:rgba(255,255,255,.3);border:1px solid rgba(192,50,90,.35);color:#c0325a;border-radius:8px;padding:7px 11px;font-size:1.1rem;cursor:pointer;line-height:1}
+@media(max-width:860px){.mob-btn{display:inline-flex;align-items:center}}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
@@ -184,6 +212,7 @@
 <!-- ── NAV ── -->
 <nav>
   <a class="nav-logo" href="index.html">Lumen</a>
+  <button id="_mobBtn" class="mob-btn" aria-label="Abrir menu" aria-expanded="false">☰</button>
   <ul class="nav-links">
     <li><a href="index.html">Início</a></li>
     <li><a href="loja.html" class="active">Loja</a></li>
@@ -436,12 +465,13 @@ function removeFromCart(id){saveCart(getCart().filter(i=>i.id!==id));}
 function openCart(){document.getElementById('cartDrawer').classList.add('open');}
 function closeCart(){document.getElementById('cartDrawer').classList.remove('open');}
 function updateCartUI(){const cart=getCart(),count=cart.reduce((s,i)=>s+i.qtd,0),total=cart.reduce((s,i)=>s+i.preco*i.qtd,0);const badge=document.getElementById('cartCount');if(badge){badge.textContent=count;badge.classList.toggle('visible',count>0);}const bc=document.getElementById('cartBtnCount');if(bc)bc.textContent=count;const te=document.getElementById('cartTotal');if(te)te.textContent=formatPrice(total);const items=document.getElementById('cartItems');if(!items)return;if(!cart.length){items.innerHTML='<div class="empty-cart">O carrinho está vazio.</div>';return;}items.innerHTML=cart.map(i=>`<div class="cart-item">${i.imagem?`<img src="${i.imagem}" alt="${i.nome}">`:'<img alt="Produto">'}<div><strong>${i.nome}</strong><span>${i.qtd} × ${formatPrice(i.preco)}</span></div><button class="cart-remove" onclick="removeFromCart('${i.id.replace(/'/g,"\'")}')">×</button></div>`).join('');}
-function checkout(){const cart=getCart(),user=getUser();if(!cart.length)return alert('O carrinho está vazio.');if(!user){alert('Precisa iniciar sessão antes de finalizar a compra.');location.href='login.html';return;}location.href='checkout.html';}
+function checkout(){const cart=getCart(),user=getUser();if(!cart.length)return alert('O carrinho está vazio.');if(!user){alert('Precisa iniciar sessão antes de finalizar a compra.');location.href='login.html';return;}if(window.gtag)gtag('event','begin_checkout',{currency:'EUR',value:getCart().reduce(function(s,i){return s+i.preco*i.qtd},0)});
+    location.href='checkout.html';}
 function subscribeNL(){const email=document.getElementById('nlEmail').value.trim(),msg=document.getElementById('nlMsg');if(!email||!email.includes('@')){msg.textContent='Por favor insira um email válido.';msg.className='nl-msg err';msg.style.display='block';return;}msg.textContent='✓ Subscrito com sucesso! Obrigada.';msg.className='nl-msg ok';msg.style.display='block';document.getElementById('nlEmail').value='';}
 function updateNavAuth(){const u=getUser(),b=document.getElementById('nav-login-btn'),a=document.getElementById('nav-user-area'),n=document.getElementById('nav-user-name');if(b)b.style.display=u?'none':'';if(a)a.style.display=u?'flex':'none';if(n&&u)n.textContent='Olá, '+(u.nome||u.email||'')+' ✦';}
 function logout(){sessionStorage.removeItem('lumen_user');updateNavAuth();}
 </script>
-<div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-label="Aviso de cookies"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas. <a href="cookies.html">Saber mais</a></p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
 
 <script id="lumen-auth-nav-script">
 (function(){

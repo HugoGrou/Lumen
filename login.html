@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lumen – Iniciar Sessão</title>
+  <meta name="description" content="Acede à tua conta Lumen ou cria uma nova para uma experiência de compra personalizada."/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Iniciar Sessão – Lumen | Área de Cliente"/>
+  <meta property="og:description" content="Acede à tua conta Lumen ou cria uma nova para uma experiência de compra personalizada."/>
+  <meta property="og:image" content="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1200"/>
+  <meta property="og:locale" content="pt_PT"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Iniciar Sessão – Lumen | Área de Cliente"/>
+  <meta name="twitter:description" content="Acede à tua conta Lumen ou cria uma nova para uma experiência de compra personalizada."/>
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1200"/>
+  <title>Iniciar Sessão – Lumen | Área de Cliente</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -123,6 +134,23 @@
 .lumen-auth-logout{font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:0;background:transparent;font-family:inherit;padding:0}
 .lumen-auth-logout:hover{color:var(--magenta,#c0325a)}
 @media(max-width:620px){.lumen-auth-area{flex-wrap:wrap}.lumen-auth-name{font-size:.8rem}}
+
+/* == COOKIE BANNER == */
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:#2a1010;color:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;z-index:9999;box-shadow:0 -4px 24px rgba(0,0,0,.22);transform:translateY(110%);opacity:0;transition:transform .4s ease,opacity .4s ease;pointer-events:none}
+.cookie-banner.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.cookie-banner p{font-size:.82rem;line-height:1.65;color:rgba(255,255,255,.8);flex:1;min-width:200px;margin:0}
+.cookie-banner p strong{color:#fff}
+.cookie-banner a{color:#f2c4ce;text-decoration:underline}
+.cookie-actions{display:flex;gap:10px;flex-shrink:0}
+.cookie-accept,.cookie-reject{border:none;border-radius:4px;padding:9px 20px;font-family:inherit;font-size:.74rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.cookie-accept{background:#c0325a;color:#fff}
+.cookie-accept:hover{background:#a02048}
+.cookie-reject{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
+.cookie-reject:hover{background:rgba(255,255,255,.2)}
+
+/* == MENU MOBILE == */
+.mob-btn{display:none;background:rgba(255,255,255,.3);border:1px solid rgba(192,50,90,.35);color:#c0325a;border-radius:8px;padding:7px 11px;font-size:1.1rem;cursor:pointer;line-height:1}
+@media(max-width:860px){.mob-btn{display:inline-flex;align-items:center}}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
@@ -137,6 +165,7 @@
 
 <nav>
   <a class="nav-logo" href="index.html">Lumen</a>
+  <button id="_mobBtn" class="mob-btn" aria-label="Abrir menu" aria-expanded="false">☰</button>
   <ul class="nav-links">
     <li><a href="index.html">Início</a></li>
     <li><a href="loja.html">Loja</a></li>
@@ -289,10 +318,10 @@ function setLoading(id,l){const b=document.getElementById(id);b.disabled=l;b.cla
 function showError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),5000);}
 function showSuccess(formId,nome){const form=document.getElementById('form-'+formId);if(!form)return;form.querySelectorAll('h2,p.sub,.form-group,.form-row,.form-check,.btn-submit,.divider,.auth-switch,.form-error').forEach(el=>el.style.display='none');const s=document.getElementById(formId+'-success');document.getElementById(formId+'-success-name').textContent='Bem-vinda, '+nome+'! ✦';s.style.display='flex';}
 async function fetchUsers(){const r=await fetch(USERS_API+'&_='+Date.now());if(!r.ok)throw new Error('SheetDB');return await r.json();}
-async function handleLogin(){const email=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-pw').value;if(!email||!pw)return showError('login-error','Preencha todos os campos.');setLoading('login-btn',true);try{const users=await fetchUsers();const user=users.find(u=>String(u.Email||u.email||'').toLowerCase()===email.toLowerCase()&&String(u.Password||u.password||'')===pw);if(user){const nome=user.Nome||user.nome||email.split('@')[0];setUser({nome,email});updateNavAuth();showSuccess('login',nome);}else showError('login-error','Email ou palavra-passe incorretos.');}catch(e){console.error(e);showError('login-error','Erro de ligação ao Google Sheets.');}setLoading('login-btn',false);}
-async function handleRegister(){const nome=(document.getElementById('reg-name').value+' '+document.getElementById('reg-surname').value).trim(),email=document.getElementById('reg-email').value.trim(),pw=document.getElementById('reg-pw').value,pw2=document.getElementById('reg-pw2').value,terms=document.getElementById('terms').checked;if(!nome||!email||!pw||!pw2)return showError('register-error','Preencha todos os campos.');if(pw.length<6)return showError('register-error','A palavra-passe deve ter pelo menos 6 caracteres.');if(pw!==pw2)return showError('register-error','As palavras-passe não coincidem.');if(!terms)return showError('register-error','Aceite os Termos e Condições.');setLoading('register-btn',true);try{const users=await fetchUsers().catch(()=>[]);if(users.some(u=>String(u.Email||u.email||'').toLowerCase()===email.toLowerCase())){showError('register-error','Este email já está registado.');setLoading('register-btn',false);return;}const novo={Nome:nome,Email:email,Password:pw,Data:new Date().toLocaleDateString('pt-PT')};const res=await fetch(USERS_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:novo})});if(!res.ok)throw new Error('SheetDB');setUser({nome,email});updateNavAuth();showSuccess('register',nome);}catch(e){console.error(e);showError('register-error','Não foi possível criar conta. Confirme a aba Clientes.');}setLoading('register-btn',false);}
+async function handleLogin(){const email=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-pw').value;if(!email||!pw)return showError('login-error','Preencha todos os campos.');setLoading('login-btn',true);try{const users=await fetchUsers();const user=users.find(u=>String(u.Email||u.email||'').toLowerCase()===email.toLowerCase()&&String(u.Password||u.password||'')===pw);if(user){const nome=user.Nome||user.nome||email.split('@')[0];setUser({nome,email});updateNavAuth();showSuccess('login',nome);if(window.gtag)gtag('event','login',{method:'email'});}else showError('login-error','Email ou palavra-passe incorretos.');}catch(e){console.error(e);showError('login-error','Erro de ligação ao Google Sheets.');}setLoading('login-btn',false);}
+async function handleRegister(){const nome=(document.getElementById('reg-name').value+' '+document.getElementById('reg-surname').value).trim(),email=document.getElementById('reg-email').value.trim(),pw=document.getElementById('reg-pw').value,pw2=document.getElementById('reg-pw2').value,terms=document.getElementById('terms').checked;if(!nome||!email||!pw||!pw2)return showError('register-error','Preencha todos os campos.');if(pw.length<6)return showError('register-error','A palavra-passe deve ter pelo menos 6 caracteres.');if(pw!==pw2)return showError('register-error','As palavras-passe não coincidem.');if(!terms)return showError('register-error','Aceite os Termos e Condições.');setLoading('register-btn',true);try{const users=await fetchUsers().catch(()=>[]);if(users.some(u=>String(u.Email||u.email||'').toLowerCase()===email.toLowerCase())){showError('register-error','Este email já está registado.');setLoading('register-btn',false);return;}const novo={Nome:nome,Email:email,Password:pw,Data:new Date().toLocaleDateString('pt-PT')};const res=await fetch(USERS_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:novo})});if(!res.ok)throw new Error('SheetDB');setUser({nome,email});updateNavAuth();showSuccess('register',nome);if(window.gtag)gtag('event','sign_up',{method:'email'});}catch(e){console.error(e);showError('register-error','Não foi possível criar conta. Confirme a aba Clientes.');}setLoading('register-btn',false);}
 </script>
-<div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-label="Aviso de cookies"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas. <a href="cookies.html">Saber mais</a></p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
 
 <script id="lumen-auth-nav-script">
 (function(){

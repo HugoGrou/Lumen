@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lumen</title>
+  <meta name="description" content="Lumen é uma loja online de beleza com os melhores produtos de cosmética e maquilhagem. Descobre produtos, serviços e dicas de beleza."/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lumen – Loja de Beleza Online | Cosmética & Maquilhagem"/>
+  <meta property="og:description" content="Lumen é uma loja online de beleza com os melhores produtos de cosmética e maquilhagem. Descobre produtos, serviços e dicas de beleza."/>
+  <meta property="og:image" content="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1200"/>
+  <meta property="og:locale" content="pt_PT"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Lumen – Loja de Beleza Online | Cosmética & Maquilhagem"/>
+  <meta name="twitter:description" content="Lumen é uma loja online de beleza com os melhores produtos de cosmética e maquilhagem. Descobre produtos, serviços e dicas de beleza."/>
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1200"/>
+  <title>Lumen – Loja de Beleza Online | Cosmética &amp; Maquilhagem</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -29,6 +40,19 @@
 .lumen-auth-logout{font-size:.75rem;color:var(--muted,#8a6060);cursor:pointer;text-decoration:underline;border:0;background:transparent;font-family:inherit;padding:0}
 .lumen-auth-logout:hover{color:var(--magenta,#c0325a)}
 @media(max-width:620px){.lumen-auth-area{flex-wrap:wrap}.lumen-auth-name{font-size:.8rem}}
+
+/* == COOKIE BANNER == */
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:#2a1010;color:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;z-index:9999;box-shadow:0 -4px 24px rgba(0,0,0,.22);transform:translateY(110%);opacity:0;transition:transform .4s ease,opacity .4s ease;pointer-events:none}
+.cookie-banner.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.cookie-banner p{font-size:.82rem;line-height:1.65;color:rgba(255,255,255,.8);flex:1;min-width:200px;margin:0}
+.cookie-banner p strong{color:#fff}
+.cookie-banner a{color:#f2c4ce;text-decoration:underline}
+.cookie-actions{display:flex;gap:10px;flex-shrink:0}
+.cookie-accept,.cookie-reject{border:none;border-radius:4px;padding:9px 20px;font-family:inherit;font-size:.74rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.cookie-accept{background:#c0325a;color:#fff}
+.cookie-accept:hover{background:#a02048}
+.cookie-reject{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
+.cookie-reject:hover{background:rgba(255,255,255,.2)}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
@@ -38,6 +62,9 @@
     gtag('js', new Date());
     gtag('config', 'G-9W57080ZKR');
   </script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"OnlineStore","name":"Lumen","description":"Loja online de beleza com cosmética e maquilhagem das melhores marcas.","url":"https://lumen.pt","logo":"https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=400","address":{"@type":"PostalAddress","streetAddress":"Rua Ferreira Borges, n.º 20","addressLocality":"Coimbra","postalCode":"3000-001","addressCountry":"PT"},"contactPoint":{"@type":"ContactPoint","telephone":"+351-239-856-908","contactType":"customer service"}}
+</script>
 </head>
 <body>
   <nav>
@@ -59,7 +86,7 @@
       <div class="hero-copy">
         <div class="eyebrow">Lumen ✦</div>
         <h1><span>Explore a Beleza</span><span>Online</span></h1>
-        <p class="lead">Site criado para fins académicos de Web Marketing, Licenciatura em Ciência de Dados para a Gestão, ISCAC.</p>
+        <p class="lead">Descobre cosmética de alta qualidade, tutoriais de beleza e serviços personalizados — as melhores marcas reunidas num espaço elegante e feito para ti.</p>
         <a class="btn" href="#marcas">Saiba Mais</a>
       </div>
       <div class="hero-img"><img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1200" alt="Produto de beleza"></div>
@@ -68,11 +95,11 @@
     <section class="tutorials"><div class="wrap two-col"><div><h2 class="section-title">Tutoriais</h2><p>Explore os nossos vídeos de tutoriais de maquiagem para aprender dicas e truques incríveis. De looks simples a maquiagens mais elaboradas, temos tudo para te inspirar a realçar a tua beleza única.</p></div><div class="tutorial-imgs"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800" alt="Tutorial maquiagem 1"><img src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=800" alt="Tutorial maquiagem 2"></div></div></section>
     <section id="produtos" class="product-showcase"><div class="wrap showcase-grid"><div class="showcase-copy"><div class="eyebrow">Produtos em destaque</div><h2 class="section-title">Maquilhagem em movimento</h2><p>Uma zona visual para dar mais vida à página inicial, com produtos, texturas e inspirações de beleza. O carrossel muda automaticamente e pode ser substituído depois por fotografias próprias da Lumen.</p></div><div class="carousel" aria-label="Carrossel de produtos de maquilhagem"><div class="slide"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1200" alt="Paleta e produtos de maquilhagem"><div class="slide-caption"><strong>Paletas luminosas</strong><span>Cores para todos os tons</span></div></div><div class="slide"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200" alt="Produtos de beleza sobre uma mesa"><div class="slide-caption"><strong>Essenciais de beleza</strong><span>Skincare e maquilhagem</span></div></div><div class="slide"><img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1200" alt="Pincéis de maquilhagem"><div class="slide-caption"><strong>Detalhes profissionais</strong><span>Pincéis, textura e acabamento</span></div></div><div class="dots"><i></i><i></i><i></i></div></div></div></section>
     <section id="visita" class="visit"><div class="wrap two-col"><div><h2 class="section-title">Visite-nos</h2><p>Pare para explorar as nossas ofertas, conectar-se com a nossa equipa, e experienciar o nosso espaço. Nós ficamos à sua espera.</p></div><div class="visit-card"><strong>Coimbra Business School ISCAC</strong><p>Quinta Agrícola, Bencanta,<br>3045-601 Coimbra</p><div class="map-frame"><iframe title="Mapa ISCAC Coimbra" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Coimbra%20Business%20School%20ISCAC&output=embed"></iframe></div></div></div></section>
-    <section class="newsletter"><div class="wrap"><div class="eyebrow">Lumen</div><h2 class="section-title">Conecte-se Conosco</h2><form class="form"><input type="email" placeholder="Email *" required><button>Assinar</button></form><div class="check">Sim, inscrever-me na newsletter.*</div></div></section>
+    <section class="newsletter"><div class="wrap"><div class="eyebrow">Lumen</div><h2 class="section-title">Conecte-se Conosco</h2><form class="form" id="nlForm" onsubmit="handleNewsletter(event)"><input type="email" id="nlEmail" placeholder="Email *" required aria-label="Endereço de email"><button type="submit">Assinar</button></form><p id="nlMsg" style="font-size:.8rem;margin-top:10px;min-height:1.2em"></p><div class="check">Sim, inscrever-me na newsletter.*</div></div></section>
   </main>
   <footer class="footer"><div class="footer-grid"><div><div class="footer-logo">Lumen</div><p>Beleza, inspiração e marcas selecionadas num espaço digital criado para fins académicos.</p><div class="payments"><span class="pay">MB WAY</span><span class="pay">MB</span></div></div><div><h4>Contactos:</h4><p>239856908<br>lumen@gmail.com</p></div><div><h4>Morada:</h4><p>Rua Ferreira Borges, n.20,<br>3000-001, Coimbra</p><p style="margin-top:12px">Facebook · Instagram</p></div></div><div class="legal"><a href="privacidade.html">Política de Privacidade</a><a href="acessibilidade.html">Declaração de acessibilidade</a><a href="envios.html">Política de Envio</a><a href="termos.html">Termos e Condições</a><a href="reembolsos.html">Política de Reembolso</a></div></footer>
 <script>function toggleMenu(){document.getElementById('mainMenu').classList.toggle('open')}document.querySelectorAll('#mainMenu a').forEach(a=>a.addEventListener('click',()=>document.getElementById('mainMenu').classList.remove('open')));</script>
-<div id="cookieBanner" class="cookie-banner"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas com Google Analytics. Pode aceitar ou recusar cookies analíticos.</p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-label="Aviso de cookies"><p><strong>Cookies Lumen</strong><br>Usamos cookies para melhorar a experiência e analisar visitas. <a href="cookies.html">Saber mais</a></p><div class="cookie-actions"><button class="cookie-reject" onclick="setCookieConsent(false)">Recusar</button><button class="cookie-accept" onclick="setCookieConsent(true)">Aceitar</button></div></div><script>function setCookieConsent(ok){localStorage.setItem('lumen_cookie_consent',ok?'accepted':'rejected');document.getElementById('cookieBanner').classList.remove('show');if(ok&&window.gtag){gtag('consent','update',{'analytics_storage':'granted'});}}(function(){var c=localStorage.getItem('lumen_cookie_consent');if(!c){setTimeout(function(){document.getElementById('cookieBanner')?.classList.add('show')},700);}else if(c==='rejected'&&window.gtag){gtag('consent','update',{'analytics_storage':'denied'});}})();</script>
 
 <script id="lumen-auth-nav-script">
 (function(){
@@ -151,6 +178,30 @@
     updateNavAuth();
   }
 })();
+</script>
+<script>
+async function handleNewsletter(e){
+  e.preventDefault();
+  var el=document.getElementById('nlEmail'), msg=document.getElementById('nlMsg');
+  var email=el.value.trim();
+  if(!email){msg.style.color='#c0325a';msg.textContent='Introduz um email válido.';return;}
+  msg.style.color='#8a6060';msg.textContent='A subscrever…';
+  try{
+    var r=await fetch('https://sheetdb.io/api/v1/uh28thaym36p8?sheet=Newsletter',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({data:{Email:email,Data:new Date().toLocaleDateString('pt-PT')}})
+    });
+    if(r.ok){
+      msg.style.color='#4a7c59';
+      msg.textContent='Subscrito com sucesso! Obrigada ✦';
+      el.value='';
+      if(window.gtag)gtag('event','newsletter_signup',{email_domain:email.split('@')[1]||''});
+    } else { throw new Error(); }
+  }catch(err){
+    msg.style.color='#c0325a';
+    msg.textContent='Não foi possível subscrever. Tenta novamente.';
+  }
+}
 </script>
 </body>
 </html>
