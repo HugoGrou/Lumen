@@ -194,9 +194,16 @@
 .cookie-reject{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
 .cookie-reject:hover{background:rgba(255,255,255,.2)}
 
-/* == MENU MOBILE == */
-.mob-btn{display:none;background:rgba(255,255,255,.3);border:1px solid rgba(192,50,90,.35);color:#c0325a;border-radius:8px;padding:7px 11px;font-size:1.1rem;cursor:pointer;line-height:1}
-@media(max-width:860px){.mob-btn{display:inline-flex;align-items:center}}
+
+
+/* == MOBILE NAV FIX == */
+@media(max-width:860px){
+  .mob-btn{display:inline-flex!important;align-items:center}
+  .nav-links{display:none!important;position:absolute;top:60px;left:0;right:0;background:rgba(242,196,206,.98);padding:14px 22px;flex-direction:column;align-items:flex-start;box-shadow:0 12px 28px rgba(192,50,90,.14);z-index:199}
+  .nav-links.open{display:flex!important}
+  .nav-links li{width:100%}
+  .nav-links a{padding:8px 0;display:block}
+}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
@@ -360,10 +367,10 @@
   <p class="section-label">Newsletter</p>
   <h2 class="section-title">Fique Sempre Inspirada</h2>
   <p class="section-desc" style="margin:0 auto">Receba os nossos artigos e promoções exclusivas na sua caixa de entrada.</p>
-  <div class="nl-form">
-    <input type="email" id="nlEmail" placeholder="O seu e-mail"/>
-    <button onclick="subscribeNL()">Assinar</button>
-  </div>
+  <form class="nl-form" id="lojaBlForm" onsubmit="subscribeNL(event)">
+    <input type="email" id="nlEmail" placeholder="O seu e-mail" required aria-label="Endereço de email"/>
+    <button type="submit">Assinar</button>
+  </form>
   <p class="nl-msg" id="nlMsg"></p>
 </div>
 
@@ -397,7 +404,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <p>© 2024 Lumen. Projeto académico — ISCAC.</p>
+    <p>© 2025 Lumen. Projeto académico — ISCAC.</p>
     <div class="footer-legal">
       <a href="privacidade.html">Privacidade</a>
       <a href="termos.html">Termos</a>
@@ -465,9 +472,9 @@ function removeFromCart(id){saveCart(getCart().filter(i=>i.id!==id));}
 function openCart(){document.getElementById('cartDrawer').classList.add('open');}
 function closeCart(){document.getElementById('cartDrawer').classList.remove('open');}
 function updateCartUI(){const cart=getCart(),count=cart.reduce((s,i)=>s+i.qtd,0),total=cart.reduce((s,i)=>s+i.preco*i.qtd,0);const badge=document.getElementById('cartCount');if(badge){badge.textContent=count;badge.classList.toggle('visible',count>0);}const bc=document.getElementById('cartBtnCount');if(bc)bc.textContent=count;const te=document.getElementById('cartTotal');if(te)te.textContent=formatPrice(total);const items=document.getElementById('cartItems');if(!items)return;if(!cart.length){items.innerHTML='<div class="empty-cart">O carrinho está vazio.</div>';return;}items.innerHTML=cart.map(i=>`<div class="cart-item">${i.imagem?`<img src="${i.imagem}" alt="${i.nome}">`:'<img alt="Produto">'}<div><strong>${i.nome}</strong><span>${i.qtd} × ${formatPrice(i.preco)}</span></div><button class="cart-remove" onclick="removeFromCart('${i.id.replace(/'/g,"\'")}')">×</button></div>`).join('');}
-function checkout(){const cart=getCart(),user=getUser();if(!cart.length)return alert('O carrinho está vazio.');if(!user){alert('Precisa iniciar sessão antes de finalizar a compra.');location.href='login.html';return;}if(window.gtag)gtag('event','begin_checkout',{currency:'EUR',value:getCart().reduce(function(s,i){return s+i.preco*i.qtd},0)});
+function checkout(){const cart=getCart(),user=getUser();if(!cart.length){const t=document.getElementById('cartToast');t.textContent='O carrinho está vazio.';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove('show');t.textContent='✓ Produto adicionado ao carrinho';},2200);return;}if(!user){const t=document.getElementById('cartToast');t.textContent='Inicia sessão para finalizar a compra.';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove('show');t.textContent='✓ Produto adicionado ao carrinho';location.href='login.html';},1800);return;}if(window.gtag)gtag('event','begin_checkout',{currency:'EUR',value:getCart().reduce(function(s,i){return s+i.preco*i.qtd},0)});
     location.href='checkout.html';}
-function subscribeNL(){const email=document.getElementById('nlEmail').value.trim(),msg=document.getElementById('nlMsg');if(!email||!email.includes('@')){msg.textContent='Por favor insira um email válido.';msg.className='nl-msg err';msg.style.display='block';return;}msg.textContent='✓ Subscrito com sucesso! Obrigada.';msg.className='nl-msg ok';msg.style.display='block';document.getElementById('nlEmail').value='';}
+async function subscribeNL(e){if(e)e.preventDefault();const email=document.getElementById('nlEmail').value.trim(),msg=document.getElementById('nlMsg');if(!email||!email.includes('@')){msg.textContent='Por favor insira um email válido.';msg.className='nl-msg err';msg.style.display='block';return;}msg.textContent='A subscrever…';msg.className='nl-msg';msg.style.display='block';try{const r=await fetch('https://sheetdb.io/api/v1/uh28thaym36p8?sheet=Newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{Email:email,Data:new Date().toLocaleDateString('pt-PT')}})});if(r.ok){msg.textContent='✓ Subscrito com sucesso! Obrigada.';msg.className='nl-msg ok';msg.style.display='block';document.getElementById('nlEmail').value='';if(window.gtag)gtag('event','newsletter_signup',{email_domain:email.split('@')[1]||''});}else{throw new Error();}}catch(err){msg.textContent='Não foi possível subscrever. Tenta novamente.';msg.className='nl-msg err';msg.style.display='block';}}
 function updateNavAuth(){const u=getUser(),b=document.getElementById('nav-login-btn'),a=document.getElementById('nav-user-area'),n=document.getElementById('nav-user-name');if(b)b.style.display=u?'none':'';if(a)a.style.display=u?'flex':'none';if(n&&u)n.textContent='Olá, '+(u.nome||u.email||'')+' ✦';}
 function logout(){sessionStorage.removeItem('lumen_user');updateNavAuth();}
 </script>

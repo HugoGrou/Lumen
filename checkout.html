@@ -42,14 +42,29 @@
 .cookie-reject:hover{background:rgba(255,255,255,.2)}
 
 /* == SUCCESS OVERLAY == */
-.success-overlay{display:none;position:fixed;inset:0;background:#fdf8f8;z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px}
+/* == SUCCESS PAGE == */
+.success-overlay{display:none;position:fixed;inset:0;background:#fdf8f8;z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;overflow-y:auto}
 .success-overlay.active{display:flex}
-.success-icon{font-size:3.5rem;margin-bottom:18px}
-.success-overlay h2{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:#2a1a1a;margin-bottom:12px}
-.success-overlay p{font-size:.92rem;color:#8a6060;line-height:1.8;max-width:440px;margin-bottom:10px}
-.order-ref{font-size:.82rem;background:rgba(192,50,90,.08);color:#c0325a;padding:6px 16px;border-radius:4px;margin:14px 0 24px;display:inline-block;font-family:monospace}
-.success-overlay a{display:inline-block;background:#c0325a;color:#fff;padding:13px 36px;border-radius:4px;text-decoration:none;font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
-.success-overlay a:hover{background:#a02048}
+.success-card{background:#fff;border:1px solid #e8d0d4;border-radius:24px;padding:52px 44px;max-width:520px;width:100%;box-shadow:0 32px 80px rgba(192,50,90,.12);animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both}
+@keyframes popIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.success-petals{font-size:2.6rem;margin-bottom:18px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.success-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,124,89,.1);color:#4a7c59;font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:20px}
+.success-badge::before{content:'✓';font-size:.85rem}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:#2a1a1a;line-height:1.1;margin-bottom:12px}
+.success-sub{font-size:.9rem;color:#8a6060;line-height:1.85;max-width:380px;margin:0 auto 24px}
+.success-divider{border:none;border-top:1px solid #e8d0d4;margin:24px 0}
+.success-details{background:#fdf8f8;border-radius:12px;padding:18px 22px;margin-bottom:24px;text-align:left}
+.success-detail-row{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;padding:5px 0}
+.success-detail-row span:first-child{color:#8a6060}
+.success-detail-row span:last-child{color:#2a1a1a;font-weight:500}
+.order-ref{display:inline-block;font-family:monospace;font-size:.9rem;font-weight:600;color:#c0325a;background:rgba(192,50,90,.08);padding:8px 18px;border-radius:6px;margin:4px 0 20px;letter-spacing:.08em}
+.success-actions{display:flex;flex-direction:column;gap:10px}
+.success-btn-primary{display:block;background:#c0325a;color:#fff;padding:14px 36px;border-radius:6px;text-decoration:none;font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;transition:.2s}
+.success-btn-primary:hover{background:#a02048;transform:translateY(-1px)}
+.success-btn-secondary{display:block;border:1.5px solid #e8d0d4;color:#8a6060;padding:12px 36px;border-radius:6px;text-decoration:none;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;transition:.2s}
+.success-btn-secondary:hover{border-color:#c0325a;color:#c0325a}
+.success-note{font-size:.74rem;color:#b0908c;margin-top:16px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -75,7 +90,11 @@ if(!user){showError('Precisa iniciar sessão antes de concluir a encomenda.');su
 document.getElementById('total').textContent=money(total);
 document.getElementById('items').innerHTML=cart.length?cart.map(i=>`<div class="item">${i.imagem?`<img src="${i.imagem}" alt="${i.nome}">`:'<img alt="Produto">'}<div><strong>${i.nome}</strong><span>${i.qtd} × ${money(i.preco)}</span></div><div class="price">${money(i.preco*i.qtd)}</div></div>`).join(''):'<p class="sub">Sem produtos no carrinho.</p>';
 if(user&&(user.Nome||user.nome))document.getElementById('nome').value=user.Nome||user.nome;
-document.getElementById('checkoutForm').addEventListener('submit',async function(e){e.preventDefault();clearError();const nome=document.getElementById('nome').value.trim();const telefone=document.getElementById('telefone').value.trim();const morada=document.getElementById('morada').value.trim();const codigoPostal=document.getElementById('codigoPostal').value.trim();const cidade=document.getElementById('cidade').value.trim();const obs=document.getElementById('observacoes').value.trim();if(!nome||!telefone||!morada||!codigoPostal||!cidade){showError('Preencha todos os campos obrigatórios da morada.');return}submitBtn.disabled=true;submitBtn.textContent='A registar...';const produtos=cart.map(i=>`${i.qtd}x ${i.nome}`).join(' | ');const venda={'Valor (€)':money(total),'Email do Cliente':(user&&(user.Email||user.email))||'',Data:new Date().toLocaleDateString('pt-PT'),Hora:new Date().toLocaleTimeString('pt-PT'),Nome:nome,Telefone:telefone,Morada:morada,'Código Postal':codigoPostal,Cidade:cidade,'Observações':obs?`${obs} | Produtos: ${produtos}`:`Produtos: ${produtos}`};try{const r=await fetch(SALES_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:venda})});if(!r.ok)throw new Error(await r.text());if(typeof gtag==='function')gtag('event','purchase',{transaction_id:'LUMEN-'+Date.now(),currency:'EUR',value:total,items:cart.map(i=>({item_name:i.nome,price:i.preco,quantity:i.qtd}))});localStorage.removeItem('lumen_cart');localStorage.removeItem('cart');localStorage.removeItem('lumenCart');document.getElementById('orderRef').textContent='Ref: LUMEN-'+Date.now().toString().slice(-6);document.getElementById('successOverlay').classList.add('active');window.scrollTo(0,0);}catch(err){console.error(err);showError('Não foi possível registar a encomenda. Confirme se a aba se chama Vendas e se as colunas têm exatamente estes nomes: Valor (€), Email do Cliente, Data, Hora, Nome, Telefone, Morada, Código Postal, Cidade e Observações.');submitBtn.disabled=false;submitBtn.textContent='Confirmar Encomenda'}});
+document.getElementById('checkoutForm').addEventListener('submit',async function(e){e.preventDefault();clearError();const nome=document.getElementById('nome').value.trim();const telefone=document.getElementById('telefone').value.trim();const morada=document.getElementById('morada').value.trim();const codigoPostal=document.getElementById('codigoPostal').value.trim();const cidade=document.getElementById('cidade').value.trim();const obs=document.getElementById('observacoes').value.trim();if(!nome||!telefone||!morada||!codigoPostal||!cidade){showError('Preencha todos os campos obrigatórios da morada.');return}submitBtn.disabled=true;submitBtn.textContent='A registar...';const produtos=cart.map(i=>`${i.qtd}x ${i.nome}`).join(' | ');const venda={'Valor (€)':money(total),'Email do Cliente':(user&&(user.Email||user.email))||'',Data:new Date().toLocaleDateString('pt-PT'),Hora:new Date().toLocaleTimeString('pt-PT'),Nome:nome,Telefone:telefone,Morada:morada,'Código Postal':codigoPostal,Cidade:cidade,'Observações':obs?`${obs} | Produtos: ${produtos}`:`Produtos: ${produtos}`};try{const r=await fetch(SALES_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:venda})});if(!r.ok)throw new Error(await r.text());if(typeof gtag==='function')gtag('event','purchase',{transaction_id:'LUMEN-'+Date.now(),currency:'EUR',value:total,items:cart.map(i=>({item_name:i.nome,price:i.preco,quantity:i.qtd}))});localStorage.removeItem('lumen_cart');localStorage.removeItem('cart');localStorage.removeItem('lumenCart');document.getElementById('orderRef').textContent='Ref: LUMEN-'+Date.now().toString().slice(-6);
+document.getElementById('successDate').textContent=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('successTotal').textContent=(Number(total)||0).toFixed(2).replace('.',',')+'€';
+document.getElementById('successOverlay').classList.add('active');
+window.scrollTo(0,0);}catch(err){console.error(err);showError('Não foi possível registar a encomenda. Confirme se a aba se chama Vendas e se as colunas têm exatamente estes nomes: Valor (€), Email do Cliente, Data, Hora, Nome, Telefone, Morada, Código Postal, Cidade e Observações.');submitBtn.disabled=false;submitBtn.textContent='Confirmar Encomenda'}});
 </script>
 
 <script id="lumen-auth-nav-script">
@@ -157,11 +176,25 @@ document.getElementById('checkoutForm').addEventListener('submit',async function
 })();
 </script>
 <div class="success-overlay" id="successOverlay">
-  <div class="success-icon">✦</div>
-  <h2>Encomenda confirmada!</h2>
-  <p>A tua encomenda foi registada com sucesso.<br>Entraremos em contacto em breve.</p>
-  <div class="order-ref" id="orderRef"></div>
-  <a href="loja.html">Continuar a explorar a loja</a>
+  <div class="success-card">
+    <div class="success-petals">✦</div>
+    <div class="success-badge">Encomenda confirmada</div>
+    <h2 class="success-title">Obrigada pela<br><em>tua compra!</em></h2>
+    <p class="success-sub">A tua encomenda foi registada com sucesso. Entraremos em contacto brevemente para confirmar a entrega.</p>
+    <div class="order-ref" id="orderRef"></div>
+    <div class="success-divider"></div>
+    <div class="success-details">
+      <div class="success-detail-row"><span>Data</span><span id="successDate"></span></div>
+      <div class="success-detail-row"><span>Total pago</span><span id="successTotal"></span></div>
+      <div class="success-detail-row"><span>Entrega</span><span>3 a 5 dias úteis</span></div>
+      <div class="success-detail-row"><span>Pagamento</span><span>MB WAY / Multibanco</span></div>
+    </div>
+    <div class="success-actions">
+      <a class="success-btn-primary" href="loja.html">Continuar a explorar a loja</a>
+      <a class="success-btn-secondary" href="index.html">Voltar ao início</a>
+    </div>
+    <p class="success-note">Receberás um email de confirmação em breve.<br>Se tiveres dúvidas, contacta-nos em <strong>lumen@gmail.com</strong></p>
+  </div>
 </div>
 </body>
 </html>

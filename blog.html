@@ -52,9 +52,16 @@ footer{background:#241010;color:white;padding:60px 7vw 28px}.footer-grid{display
 .cookie-reject{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
 .cookie-reject:hover{background:rgba(255,255,255,.2)}
 
-/* == MENU MOBILE == */
-.mob-btn{display:none;background:rgba(255,255,255,.3);border:1px solid rgba(192,50,90,.35);color:#c0325a;border-radius:8px;padding:7px 11px;font-size:1.1rem;cursor:pointer;line-height:1}
-@media(max-width:860px){.mob-btn{display:inline-flex;align-items:center}}
+
+
+/* == MOBILE NAV FIX == */
+@media(max-width:860px){
+  .mob-btn{display:inline-flex!important;align-items:center}
+  .nav-links{display:none!important;position:absolute;top:60px;left:0;right:0;background:rgba(242,196,206,.98);padding:14px 22px;flex-direction:column;align-items:flex-start;box-shadow:0 12px 28px rgba(192,50,90,.14);z-index:199}
+  .nav-links.open{display:flex!important}
+  .nav-links li{width:100%}
+  .nav-links a{padding:8px 0;display:block}
+}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
@@ -149,10 +156,11 @@ footer{background:#241010;color:white;padding:60px 7vw 28px}.footer-grid{display
   <div class="label">Newsletter</div>
   <h2 class="title">Recebe dicas Lumen no teu email</h2>
   <p>Novidades, guias e sugestões de produtos para melhorares a tua rotina de beleza.</p>
-  <form class="nl-form" onsubmit="event.preventDefault(); alert('Obrigada por subscreveres a newsletter Lumen!'); this.reset();">
+  <form class="nl-form" id="blogNlForm" onsubmit="handleBlogNL(event)">
     <input type="email" placeholder="O teu email" required>
     <button type="submit">Subscrever</button>
   </form>
+   <p id="blogNlMsg" style="font-size:.82rem;margin-top:12px;font-weight:500"></p>
 </section>
 
 <footer>
@@ -262,6 +270,30 @@ buttons.forEach(btn=>btn.addEventListener('click',()=>{buttons.forEach(b=>b.clas
     a.addEventListener('click',function(){menu.classList.remove('open');});
   });
 })();
+</script>
+<script>
+async function handleBlogNL(e){
+  e.preventDefault();
+  var el=document.getElementById('blogNlEmail'), msg=document.getElementById('blogNlMsg');
+  var email=el.value.trim();
+  if(!email){msg.style.color='#c0325a';msg.textContent='Introduz um email válido.';return;}
+  msg.style.color='#8a6060';msg.textContent='A subscrever…';
+  try{
+    var r=await fetch('https://sheetdb.io/api/v1/uh28thaym36p8?sheet=Newsletter',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({data:{Email:email,Data:new Date().toLocaleDateString('pt-PT')}})
+    });
+    if(r.ok){
+      msg.style.color='#4a7c59';
+      msg.textContent='Subscrito com sucesso! Obrigada ✦';
+      el.value='';
+      if(window.gtag)gtag('event','newsletter_signup',{email_domain:email.split('@')[1]||''});
+    } else { throw new Error(); }
+  }catch(err){
+    msg.style.color='#c0325a';
+    msg.textContent='Não foi possível subscrever. Tenta novamente.';
+  }
+}
 </script>
 </body>
 </html>

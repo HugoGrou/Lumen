@@ -61,9 +61,16 @@
 .cookie-reject{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
 .cookie-reject:hover{background:rgba(255,255,255,.2)}
 
-/* == MENU MOBILE == */
-.mob-btn{display:none;background:rgba(255,255,255,.3);border:1px solid rgba(192,50,90,.35);color:#c0325a;border-radius:8px;padding:7px 11px;font-size:1.1rem;cursor:pointer;line-height:1}
-@media(max-width:860px){.mob-btn{display:inline-flex;align-items:center}}
+
+
+/* == MOBILE NAV FIX == */
+@media(max-width:860px){
+  .mob-btn{display:inline-flex!important;align-items:center}
+  .nav-links{display:none!important;position:absolute;top:60px;left:0;right:0;background:rgba(242,196,206,.98);padding:14px 22px;flex-direction:column;align-items:flex-start;box-shadow:0 12px 28px rgba(192,50,90,.14);z-index:199}
+  .nav-links.open{display:flex!important}
+  .nav-links li{width:100%}
+  .nav-links a{padding:8px 0;display:block}
+}
 </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9W57080ZKR"></script>
