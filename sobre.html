@@ -63,13 +63,15 @@
 
 
 
-/* == MOBILE NAV FIX == */
-@media(max-width:860px){
-  .mob-btn{display:inline-flex!important;align-items:center}
-  .nav-links{display:none!important;position:absolute;top:60px;left:0;right:0;background:rgba(242,196,206,.98);padding:14px 22px;flex-direction:column;align-items:flex-start;box-shadow:0 12px 28px rgba(192,50,90,.14);z-index:199}
-  .nav-links.open{display:flex!important}
+
+/* == MOBILE NAV == */
+#_mobBtn{display:none}
+@media(max-width:900px){
+  #_mobBtn{display:inline-flex!important;align-items:center}
+  .nav-links{display:none!important}
+  .nav-links.open{display:flex!important;position:fixed;top:64px;left:0;right:0;flex-direction:column;background:rgba(242,196,206,.98);padding:14px 22px;box-shadow:0 12px 28px rgba(192,50,90,.14);z-index:9999;gap:0;list-style:none}
   .nav-links li{width:100%}
-  .nav-links a{padding:8px 0;display:block}
+  .nav-links a{padding:10px 0;display:block;font-size:.9rem}
 }
 </style>
   <!-- Google Analytics -->
